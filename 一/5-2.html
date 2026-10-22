@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盒模型 · Box Model</title>
+<style>
+  /* ---------- 基础重置 ---------- */
+  body, h1, p, ul { margin: 0; padding: 0; }
+  ul { list-style: none; }
+
+  /* ---------- 页面 ---------- */
+  body {
+    min-height: 100vh;
+    padding: 60px 24px 90px;
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+                 system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #0f1e33;
+    background:
+      radial-gradient(900px 520px at 8% -12%, rgba(37, 99, 235, .18), transparent 62%),
+      radial-gradient(820px 480px at 96% 4%, rgba(124, 58, 237, .14), transparent 64%),
+      linear-gradient(165deg, #f6f9fe 0%, #edf1fa 48%, #f8f6fd 100%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- 页头 ---------- */
+  .page-head {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .eyebrow {
+    font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .34em;
+    text-transform: uppercase;
+    color: #93a3bb;
+    margin-bottom: 16px;
+  }
+  .page-head h1 {
+    font-size: clamp(28px, 4.2vw, 42px);
+    font-weight: 800;
+    letter-spacing: -.01em;
+    line-height: 1.15;
+  }
+  .page-head h1 span {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: .58em;
+    font-weight: 500;
+    letter-spacing: .06em;
+    color: #8798b1;
+    vertical-align: 4px;
+  }
+  .sub {
+    margin-top: 16px;
+    font-size: 14.5px;
+    letter-spacing: .12em;
+    color: #7a8aa3;
+  }
+
+  /* ---------- 盒子 ---------- */
+  .box {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    margin: 40px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+    box-shadow:
+      0 26px 50px -26px rgba(15, 30, 51, .30),
+      0 2px 8px rgba(15, 30, 51, .05);
+    transition:
+      transform .38s cubic-bezier(.2, .7, .3, 1),
+      box-shadow .38s cubic-bezier(.2, .7, .3, 1);
+  }
+  .box:hover {
+    transform: translateY(-6px);
+    box-shadow:
+      0 38px 66px -28px rgba(15, 30, 51, .38),
+      0 4px 14px rgba(15, 30, 51, .07);
+  }
+
+  /* 右上角标签 */
+  .box::before {
+    content: attr(data-tag);
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    padding: 6px 13px;
+    border-radius: 999px;
+    font: 700 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .08em;
+    color: var(--c);
+    background: var(--soft);
+  }
+
+  /* 左下角参数说明 */
+  .box::after {
+    content: attr(data-spec);
+    position: absolute;
+    bottom: 22px;
+    left: 26px;
+    font: 500 12.5px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .04em;
+    color: #93a3bb;
+  }
+
+  .content {
+    font-size: clamp(22px, 2.6vw, 34px);
+    font-weight: 800;
+    letter-spacing: .18em;
+    margin-right: -.18em;      /* 修正字距造成的视觉偏移 */
+    color: var(--c);
+  }
+
+  /* ---------- 三个盒子的差异 ---------- */
+  .a {
+    --c: #2563eb;
+    --soft: rgba(37, 99, 235, .10);
+    border: 2px dotted #2563eb;
+    padding: 70px 60px 50px 40px;   /* 上 右 下 左 */
+    margin: 40px auto;
+  }
+  .b {
+    --c: #7c3aed;
+    --soft: rgba(124, 58, 237, .10);
+    border: 2px dashed #7c3aed;
+    margin: 50px auto 40px;         /* 上 左右 下 */
+  }
+  .c {
+    --c: #0891b2;
+    --soft: rgba(8, 145, 178, .10);
+    border: 2px solid #0891b2;
+    margin: 50px auto 40px;
+  }
+
+  /* ---------- 小屏适配 ---------- */
+  @media (max-width: 700px) {
+    body { padding: 40px 16px 64px; }
+    .page-head { margin-bottom: 36px; }
+    .box {
+      width: min(500px, calc(100vw - 32px));
+      height: auto;
+      aspect-ratio: 1 / 1;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <header class="page-head">
+    <p class="eyebrow">CSS Fundamentals</p>
+    <h1>盒模型<span>Box Model</span></h1>
+    <p class="sub">内容 · 内边距 · 边框 · 外边距</p>
+  </header>
+
+  <div class="box a" data-tag=".a" data-spec="padding: 70 / 60 / 50 / 40">
+    <span class="content">0416王云鹤</span>
+  </div>
+
+  <div class="box b" data-tag=".b" data-spec="margin: 50 auto 40">
+    <span class="content">0416王云鹤</span>
+  </div>
+
+  <div class="box c" data-tag=".c" data-spec="border: 2px solid">
+    <span class="content">0416王云鹤</span>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0416王云鹤</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f5f5f5;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        h1 {
+            color: #333;
+            letter-spacing: 4px;
+        }
+
+        /* 幻灯片容器：宽度固定，超出部分隐藏，是"窗口" */
+        .slideshow {
+            width: 640px;
+            height: 420px;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 图片轨道：横向排列 4 张，整体左右平移，实现图片位置动画 */
+        .track {
+            display: flex;
+            animation: slide 12s ease-in-out infinite;
+        }
+
+        /* 每张占满一个窗口宽度（100% = 容器的 640px），且不允许被压缩 */
+        .slide {
+            flex: 0 0 100%;
+        }
+
+        /* 上图 */
+        .slide img {
+            display: block;
+            width: 100%;
+            height: 340px;
+            object-fit: cover; /* 保持比例裁切，图片不会被拉变形 */
+        }
+
+        /* 下文 */
+        .slide p {
+            margin: 0;
+            height: 80px;
+            line-height: 80px;
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+            background-color: #fff;
+        }
+
+        /* 关键帧：每张停留 3 秒，滑动 1 秒，一个周期 12 秒。
+           第 4 张是 1.jpg 的副本，所以 100% 跳回 0% 时画面完全一样，
+           看不出"倒带"，形成无缝循环 */
+        @keyframes slide {
+            0%, 25%        { transform: translateX(0); }      /* 第 1 张 */
+            33.33%, 58.33% { transform: translateX(-100%); }  /* 第 2 张 */
+            66.67%, 91.67% { transform: translateX(-200%); }  /* 第 3 张 */
+            100%           { transform: translateX(-300%); }  /* 1.jpg 副本，与第 1 张同画面 */
+        }
+    </style>
+</head>
+<body>
+    <h1>王云鹤</h1>
+
+    <div class="slideshow">
+        <div class="track">
+            <div class="slide">
+                <img src="img/1.jpg" alt="1.jpg">
+                <p>王云鹤 · 1.jpg</p>
+            </div>
+            <div class="slide">
+                <img src="img/2.jpg" alt="2.jpg">
+                <p>王云鹤 · 2.jpg</p>
+            </div>
+            <div class="slide">
+                <img src="img/3.jpg" alt="3.jpg">
+                <p>王云鹤 · 3.jpg</p>
+            </div>
+            <!-- 副本：只为了让循环无缝衔接，不改变"图片用 1.jpg 到 3.jpg"的要求 -->
+            <div class="slide">
+                <img src="img/1.jpg" alt="1.jpg">
+                <p>王云鹤 · 1.jpg</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

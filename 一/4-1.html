@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0416王云鹤</title>
+    <style>
+        /* 统一盒模型，宽度计算更精准 */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* ===== 页面背景与整体居中 ===== */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 48px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: radial-gradient(circle at 15% 0%, #f7faff 0%, #e9eff8 45%, #dfe7f2 100%);
+            font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", system-ui, -apple-system, sans-serif;
+        }
+
+        h2, h3, p {
+            padding: 0;
+            margin: 0;
+        }
+
+        /* ===== 主标题：黑底白字、居中、行高 150% ===== */
+        h2 {
+            width: min(520px, 100%);
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #232a36 0%, #000 100%);
+            color: #fff;
+            font-size: 20px;
+            text-align: center;
+            line-height: 150%;
+            letter-spacing: 2px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        /* ===== 内容卡片 ===== */
+        #box {
+            width: min(520px, 100%);
+            padding: 26px 30px 30px;
+            margin: 0 0 8px;
+            background: #fff;
+            border: 1px solid #e3e9f2;
+            border-top: none;               /* 与标题无缝衔接 */
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 20px 45px -22px rgba(24, 48, 90, .35),
+                        0 2px 8px rgba(24, 48, 90, .05);
+            font-size: 14px;
+        }
+
+        /* ===== 副标题 ===== */
+        #box h3 {
+            font-size: 18px;
+            line-height: 34px;
+            text-align: center;
+            color: #0b3a63;
+            letter-spacing: 4px;
+        }
+
+        /* 副标题下方的小装饰线 */
+        #box h3::after {
+            content: "";
+            display: block;
+            width: 46px;
+            height: 3px;
+            margin: 8px auto 20px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #1a73e8, #7db2ff);
+        }
+
+        /* ===== 段落（后代选择器） ===== */
+        #box > p {
+            color: #4a5568;
+            text-indent: 2em;
+            line-height: 200%;
+            text-align: justify;
+        }
+
+        /* ===== 学号 / 姓名 / 班级：蓝色加粗 ===== */
+        .info {
+            color: #1558d6;
+            font-weight: bold;
+            letter-spacing: .5px;
+        }
+
+        /* ===== 知识点：蓝底白字（标签样式） ===== */
+        .tip {
+            display: inline-block;
+            padding: 1px 10px;
+            background: linear-gradient(135deg, #1a73e8, #0b57c9);
+            color: #fff;
+            font-size: 13px;
+            line-height: 22px;
+            letter-spacing: .5px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px -6px rgba(26, 115, 232, .9);
+        }
+
+        /* ===== 链接 ===== */
+        #box a {
+            color: #e0483a;
+            text-decoration: none;
+            padding: 1px 4px;
+            margin-left: 4px;
+            border-radius: 4px;
+            border-bottom: 1px solid rgba(224, 72, 58, .4);
+            transition: color .25s, background-color .25s, border-color .25s;
+        }
+
+        #box a:hover {
+            color: #fff;
+            background: #e0483a;
+            border-bottom-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <h2>css群组选择器和后代选择器</h2>
+
+    <div id="box">
+        <h3>CSS进阶</h3>
+        <p>
+            学号：<span class="info">0416</span>，姓名：<span class="info">王云鹤</span>，班级：<span class="info">计算机24006</span>，《高级网页设计》设计的学习难度：中等，本实例的知识点：<span class="tip">CSS群组选择器和后代选择器</span>。<a href="#" target="_blank">更多详情</a>
+        </p>
+    </div>
+
+    <!--
+        要求说明：
+        1. 学号、姓名、班级的值蓝色加粗，共用 .info 选择器
+        2. h2 黑底白字、居中、行高 150%
+        3. 知识点的值蓝底白字 .tip
+    -->
+</body>
+</html>

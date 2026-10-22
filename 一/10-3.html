@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- 移动端适配：没有这一行，手机浏览器会按 980px 渲染，媒体查询就失效了 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0416王云鹤</title>
+    <style>
+        /* ===== rem 的基准：1rem = html 的字号 ===== */
+        html {
+            font-size: 16px; /* 默认（小屏） */
+        }
+
+        body {
+            margin: 0;
+        }
+
+        /* ===== 全屏盒子 ===== */
+        .box {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;   /* 两行文字上下排列 */
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            background-color: #e74c3c; /* 默认（< 600px）：红 */
+            font-size: 2rem;           /* 用 rem，跟着 html 字号一起缩放 */
+            transition: background-color 0.4s; /* 换色时平滑过渡 */
+        }
+
+        .box p {
+            margin: 0;
+        }
+
+        /* 提示文字：同样用 rem */
+        .box .tip {
+            margin-top: 1rem;
+            font-size: 1rem;
+            opacity: 0.85;
+        }
+
+        /* 断点提示条，用 content 显示当前生效的媒体查询 */
+        .box::after {
+            content: "小屏：小于 600px";
+            margin-top: 2rem;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 2rem;
+        }
+
+        /* ===== 媒体查询：视口宽度变化 → 背景颜色 + 根字号一起变 =====
+           移动优先写法：默认样式写小屏，宽屏用 min-width 逐级覆盖 */
+
+        @media (min-width: 600px) {
+            html { font-size: 20px; }              /* 1rem 变大 → 全页文字变大 */
+            .box { background-color: #f39c12; }    /* 黄 */
+            .box::after { content: "中屏：600px ~ 899px"; }
+        }
+
+        @media (min-width: 900px) {
+            html { font-size: 24px; }
+            .box { background-color: #27ae60; }    /* 绿 */
+            .box::after { content: "大屏：900px ~ 1199px"; }
+        }
+
+        @media (min-width: 1200px) {
+            html { font-size: 28px; }
+            .box { background-color: #2980b9; }    /* 蓝 */
+            .box::after { content: "超大屏：1200px 及以上"; }
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <p>王云鹤</p>
+        <p class="tip">拖动窗口大小，背景颜色和文字大小都会跟着变</p>
+    </div>
+</body>
+</html>

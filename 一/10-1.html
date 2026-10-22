@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0416王云鹤</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f5f5f5;
+        }
+
+        .box {
+            width: 300px;
+            height: 300px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            /* 纯 CSS 动画：4 秒一个周期，无限循环，缓入缓出 */
+            animation: changeColor 4s ease-in-out infinite;
+        }
+
+        /* 关键帧：0% -> 25% -> 50% -> 75% 四种颜色，
+           100% 回到第一种，保证首尾衔接不跳变 */
+        @keyframes changeColor {
+            0% {
+                background-color: #e74c3c; /* 红 */
+            }
+            25% {
+                background-color: #f1c40f; /* 黄 */
+            }
+            50% {
+                background-color: #2ecc71; /* 绿 */
+            }
+            75% {
+                background-color: #3498db; /* 蓝 */
+            }
+            100% {
+                background-color: #e74c3c; /* 红，与 0% 相同 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="box"></div>
+</body>
+</html>

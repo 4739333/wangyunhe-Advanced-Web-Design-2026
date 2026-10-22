@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0416王云鹤</title>
+    <style>
+        body {
+            margin: 0;
+            min-width: 320px;      /* 页面最小宽度：窄于 320px 就出现横向滚动条 */
+            padding: 24px;
+            background-color: #f5f5f5;
+            font-family: "Microsoft YaHei", sans-serif;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            letter-spacing: 4px;
+        }
+
+        .sub {
+            text-align: center;
+            color: #888;
+            margin: 0 0 24px;
+        }
+
+        /* 网格布局：一行放几个，只看 grid-template-columns 里的数字 */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr); /* 默认：一行 1 个 */
+            gap: 12px;                             /* 间距固定，不用自己算宽度 */
+        }
+
+        .item {
+            height: 110px;
+            display: flex;              /* 让数字在盒子里居中 */
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            color: #fff;
+            background-color: #3498db;
+            border-radius: 10px;
+        }
+
+        /* ===== 3 个媒体查询断点：视口变宽，一行放的盒子就变多 ===== */
+
+        @media (min-width: 600px) {
+            .container { grid-template-columns: repeat(2, 1fr); }  /* 一行 2 个 */
+        }
+
+        @media (min-width: 900px) {
+            .container { grid-template-columns: repeat(4, 1fr); }  /* 一行 4 个 */
+        }
+
+        @media (min-width: 1200px) {
+            .container { grid-template-columns: repeat(8, 1fr); }  /* 一行 8 个 */
+        }
+    </style>
+</head>
+<body>
+    <h1>王云鹤</h1>
+    <p class="sub">拖动窗口宽度，一行显示的盒子数量会变化</p>
+
+    <div class="container">
+        <div class="item">1</div>
+        <div class="item">2</div>
+        <div class="item">3</div>
+        <div class="item">4</div>
+        <div class="item">5</div>
+        <div class="item">6</div>
+        <div class="item">7</div>
+        <div class="item">8</div>
+    </div>
+</body>
+</html>

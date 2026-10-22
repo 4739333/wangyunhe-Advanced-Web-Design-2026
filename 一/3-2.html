@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>0416 王云鹤</title>
+    <style>
+        /* 全局重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", "PingFang SC", Roboto, sans-serif;
+            background: #f2f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* 主容器 – 卡片效果 */
+        #box {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 40px 44px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            max-width: 560px;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        #box:hover {
+            transform: translateY(-3px);
+        }
+
+        /* 1. h2 黑底白字 */
+        h2 {
+            background: #0b0f1a;
+            color: #ffffff;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        /* 3. h3 背景深色，使“选择器”白色可见 */
+        h3 {
+            background: #1e2a3a;
+            color: #cbd5e1;          /* 浅灰色，与白色区分 */
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: inline-block;    /* 让背景只包裹文字 */
+            width: auto;
+        }
+
+        /* “选择器”三个字强制白色 */
+        .highlight-white {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        /* 段落样式 */
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            padding: 10px 14px;
+            background: #f8faff;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border-left: 4px solid #3b6ea5;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        p:last-of-type {
+            margin-bottom: 0;
+        }
+
+        /* 名字每个字不同颜色（在同一行） */
+        .name-char {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        .char-wang { color: #d94f4f; }  /* 王 – 红色 */
+        .char-yun  { color: #2a7a3b; }  /* 云 – 绿色 */
+        .char-he   { color: #2a6bb0; }  /* 鹤 – 蓝色 */
+
+        /* 4. 新加盒子 – 学号 */
+        #student-id {
+            width: 140px;
+            height: 70px;
+            background: linear-gradient(135deg, #f6b26b, #e69138);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            margin-top: 24px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 6px 14px rgba(230, 145, 56, 0.3);
+            letter-spacing: 2px;
+        }
+
+        /* 小屏适配 */
+        @media (max-width: 480px) {
+            #box {
+                padding: 24px 18px;
+            }
+            h2 {
+                font-size: 22px;
+                padding: 12px 16px;
+            }
+            h3 {
+                font-size: 17px;
+                padding: 8px 14px;
+            }
+            p {
+                font-size: 16px;
+            }
+            #student-id {
+                width: 110px;
+                height: 60px;
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="box">
+    <!-- 主标题：黑底白字 -->
+    <h2>层叠样式表 CSS</h2>
+
+    <!-- h3 中 “选择器” 为白色（其余为浅灰） -->
+    <h3>CSS <span class="highlight-white">选择器</span></h3>
+
+    <!-- 名字：王云鹤，每个字不同颜色，同一行 -->
+    <p>
+        <span class="name-char char-wang">王</span>
+        <span class="name-char char-yun">云</span>
+        <span class="name-char char-he">鹤</span>
+    </p>
+
+    <!-- 第二个段落 -->
+    <p>CSS 属性</p>
+
+    <!-- 新加盒子：学号 0416 -->
+    <div id="student-id">0416</div>
+</div>
+
+</body>
+</html>
