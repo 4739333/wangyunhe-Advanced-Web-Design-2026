@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-10-22 功能：JavaScript 六种基础数据类型演示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 六种基础数据类型</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            color: #e8ebf7;
+            padding: 48px 20px 70px;
+            line-height: 1.7;
+        }
+
+        .wyh_container {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        .wyh_title {
+            text-align: center;
+            font-size: 34px;
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, #7ab8ff, #b48cff, #63e6be);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .wyh_subtitle {
+            text-align: center;
+            color: #93a0c8;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 42px;
+        }
+
+        .wyh_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 22px;
+        }
+
+        .wyh_card {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 16px;
+            padding: 24px 26px;
+            position: relative;
+            overflow: hidden;
+            transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+        }
+
+        .wyh_card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--wyh_theme, #7ab8ff);
+        }
+
+        .wyh_card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, .25);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, .4);
+        }
+
+        .wyh_card_name {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .wyh_card_name h2 {
+            font-size: 20px;
+            letter-spacing: 1px;
+            color: var(--wyh_theme, #7ab8ff);
+        }
+
+        .wyh_tag {
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--wyh_theme, #7ab8ff);
+            color: var(--wyh_theme, #7ab8ff);
+        }
+
+        .wyh_def {
+            font-size: 14px;
+            color: #b9c3e2;
+            margin-bottom: 14px;
+        }
+
+        .wyh_code {
+            background: rgba(0, 0, 0, .35);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            color: #c9e3ff;
+            margin-bottom: 14px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .wyh_result {
+            display: none;
+            background: rgba(0, 0, 0, .25);
+            border-left: 3px solid var(--wyh_theme, #7ab8ff);
+            border-radius: 0 8px 8px 0;
+            padding: 10px 14px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            color: #9be8c4;
+            margin-bottom: 14px;
+            white-space: pre-wrap;
+        }
+
+        .wyh_result.wyh_show {
+            display: block;
+            animation: wyh_fadeIn .35s ease;
+        }
+
+        @keyframes wyh_fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .wyh_btn {
+            display: inline-block;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            background: var(--wyh_theme, #7ab8ff);
+            color: #10142b;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+        }
+
+        .wyh_btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+        }
+
+        .wyh_btn:active {
+            transform: scale(.95);
+        }
+
+        .wyh_summary {
+            margin-top: 34px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 16px;
+            padding: 24px 26px;
+        }
+
+        .wyh_summary h2 {
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: #63e6be;
+            margin-bottom: 14px;
+        }
+
+        .wyh_table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .wyh_table th,
+        .wyh_table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .wyh_table th {
+            color: #93a0c8;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .wyh_table td:first-child {
+            font-family: Consolas, monospace;
+            color: #b48cff;
+        }
+
+        .wyh_table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .wyh_back {
+            display: block;
+            width: 200px;
+            margin: 36px auto 0;
+            padding: 12px 0;
+            text-align: center;
+            color: #10142b;
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #7ab8ff, #b48cff);
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .wyh_back:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 26px rgba(122, 184, 255, .4);
+        }
+    </style>
+</head>
+<body>
+    <div class="wyh_container">
+        <h1 class="wyh_title">JavaScript 六种基础数据类型</h1>
+        <p class="wyh_subtitle">基础类型（Primitive Types）的值不可变，按值访问，共六种</p>
+
+        <div class="wyh_grid">
+            <div class="wyh_card" style="--wyh-theme:#7ab8ff;">
+                <div class="wyh_card_name"><h2>String 字符串</h2><span class="wyh_tag">文本</span></div>
+                <p class="wyh_def">表示文本数据，可用单引号、双引号或反引号包裹，反引号支持 ${} 模板插值。</p>
+                <div class="wyh_code">const wyh_str = '王云鹤';</div>
+                <div class="wyh_result" id="wyh_result_str"></div>
+                <button class="wyh_btn" onclick="wyh_demoStr()">运行演示</button>
+            </div>
+
+            <div class="wyh_card" style="--wyh-theme:#63e6be;">
+                <div class="wyh_card_name"><h2>Number 数字</h2><span class="wyh_tag">数值</span></div>
+                <p class="wyh_def">整数与浮点数统一为 Number 类型，还支持特殊值 NaN、Infinity。</p>
+                <div class="wyh_code">const wyh_num = 42;
+const wyh_float = 3.14;
+const wyh_not = 0 / 0;</div>
+                <div class="wyh_result" id="wyh_result_num"></div>
+                <button class="wyh_btn" onclick="wyh_demoNum()">运行演示</button>
+            </div>
+
+            <div class="wyh_card" style="--wyh-theme:#ffd166;">
+                <div class="wyh_card_name"><h2>Boolean 布尔</h2><span class="wyh_tag">逻辑</span></div>
+                <p class="wyh_def">只有两个值：true 与 false，常用于条件判断。</p>
+                <div class="wyh_code">const wyh_yes = true;
+const wyh_no = false;</div>
+                <div class="wyh_result" id="wyh_result_bool"></div>
+                <button class="wyh_btn" onclick="wyh_demoBool()">运行演示</button>
+            </div>
+
+            <div class="wyh_card" style="--wyh-theme:#b48cff;">
+                <div class="wyh_card_name"><h2>Undefined 未定义</h2><span class="wyh_tag">空缺</span></div>
+                <p class="wyh_def">声明了变量但未赋值时，其默认值就是 undefined。</p>
+                <div class="wyh_code">let wyh_empty;</div>
+                <div class="wyh_result" id="wyh_result_undef"></div>
+                <button class="wyh_btn" onclick="wyh_demoUndef()">运行演示</button>
+            </div>
+
+            <div class="wyh_card" style="--wyh-theme:#ff8fa3;">
+                <div class="wyh_card_name"><h2>Null 空值</h2><span class="wyh_tag">空缺</span></div>
+                <p class="wyh_def">表示"有意为空"，需要手动赋值 null；typeof 的历史遗留缺陷会返回 object。</p>
+                <div class="wyh_code">const wyh_none = null;</div>
+                <div class="wyh_result" id="wyh_result_null"></div>
+                <button class="wyh_btn" onclick="wyh_demoNull()">运行演示</button>
+            </div>
+
+            <div class="wyh_card" style="--wyh-theme:#4cc9f0;">
+                <div class="wyh_card_name"><h2>Symbol 符号</h2><span class="wyh_tag">ES6</span></div>
+                <p class="wyh_def">ES6 新增，表示独一无二的值，主要用作对象属性的键，避免命名冲突。</p>
+                <div class="wyh_code">const wyh_sym1 = Symbol('id');
+const wyh_sym2 = Symbol('id');</div>
+                <div class="wyh_result" id="wyh_result_sym"></div>
+                <button class="wyh_btn" onclick="wyh_demoSym()">运行演示</button>
+            </div>
+        </div>
+
+        <div class="wyh_summary">
+            <h2>typeof 速查表</h2>
+            <table class="wyh_table">
+                <tr><th>类型</th><th>示例值</th><th>typeof 结果</th><th>说明</th></tr>
+                <tr><td>String</td><td>'hello'</td><td>"string"</td><td>文本</td></tr>
+                <tr><td>Number</td><td>42 / 3.14 / NaN</td><td>"number"</td><td>整数与浮点数同类</td></tr>
+                <tr><td>Boolean</td><td>true / false</td><td>"boolean"</td><td>逻辑值</td></tr>
+                <tr><td>Undefined</td><td>未赋值的变量</td><td>"undefined"</td><td>声明未赋值</td></tr>
+                <tr><td>Null</td><td>null</td><td>"object"</td><td>历史遗留缺陷，实为基础类型</td></tr>
+                <tr><td>Symbol</td><td>Symbol('id')</td><td>"symbol"</td><td>ES6 新增，值唯一</td></tr>
+            </table>
+        </div>
+
+        <a class="wyh_back" href="index.html">返回首页</a>
+    </div>
+
+    <script>
+        // 每种类型的演示函数：把运行结果写入对应卡片的结果区
+        function wyh_show(wyh_id, wyh_text) {
+            const wyh_box = document.getElementById(wyh_id);
+            wyh_box.textContent = wyh_text;
+            wyh_box.classList.add('wyh_show');
+        }
+
+        function wyh_demoStr() {
+            const wyh_str = '王云鹤';
+            const wyh_tpl = `你好，${wyh_str}！长度 = ${wyh_str.length}`;
+            wyh_show('wyh_result_str',
+                `wyh_str = ${wyh_str}\nwyh_str.length = ${wyh_str.length}\ntypeof wyh_str → "${typeof wyh_str}"\n${wyh_tpl}`);
+        }
+
+        function wyh_demoNum() {
+            const wyh_num = 42;
+            const wyh_float = 3.14;
+            const wyh_not = 0 / 0;
+            wyh_show('wyh_result_num',
+                `wyh_num = ${wyh_num}\nwyh_float = ${wyh_float}\nwyh_not = ${wyh_not}（NaN 不等于自身：${wyh_not !== wyh_not}）\ntypeof wyh_num → "${typeof wyh_num}"`);
+        }
+
+        function wyh_demoBool() {
+            const wyh_yes = true;
+            const wyh_no = false;
+            wyh_show('wyh_result_bool',
+                `wyh_yes && wyh_no → ${wyh_yes && wyh_no}\nwyh_yes || wyh_no → ${wyh_yes || wyh_no}\n!"wyh_no" → ${!wyh_no}\ntypeof wyh_yes → "${typeof wyh_yes}"`);
+        }
+
+        function wyh_demoUndef() {
+            let wyh_empty;
+            wyh_show('wyh_result_undef',
+                `wyh_empty = ${String(wyh_empty)}\nwyh_empty === undefined → ${wyh_empty === undefined}\ntypeof wyh_empty → "${typeof wyh_empty}"`);
+        }
+
+        function wyh_demoNull() {
+            const wyh_none = null;
+            wyh_show('wyh_result_null',
+                `wyh_none = ${wyh_none}\nwyh_none === undefined → ${wyh_none === undefined}（null 与 undefined 不同）\ntypeof wyh_none → "${typeof wyh_none}"（历史遗留缺陷）`);
+        }
+
+        function wyh_demoSym() {
+            const wyh_sym1 = Symbol('id');
+            const wyh_sym2 = Symbol('id');
+            wyh_show('wyh_result_sym',
+                `wyh_sym1 = ${wyh_sym1.toString()}\nwyh_sym2 = ${wyh_sym2.toString()}\nwyh_sym1 === wyh_sym2 → ${wyh_sym1 === wyh_sym2}（描述相同也唯一）\ntypeof wyh_sym1 → "${typeof wyh_sym1}"`);
+        }
+    </script>
+</body>
+</html>
