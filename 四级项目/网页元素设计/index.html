@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-10-22 功能：网页元素设计（导航、上图下文、左图右文、一左一右） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智慧校园 · 网页元素设计</title>
+<style>
+/* ---------- 公共CSS ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #f3f6fc;
+    color: #1e2536;
+    line-height: 1.7;
+}
+
+.wyh_container {
+    width: min(1120px, 94%);
+    margin: 0 auto;
+}
+
+.wyh_icon {
+    width: 18px;
+    height: 18px;
+    vertical-align: -3px;
+}
+
+.wyh_section_title {
+    font-size: 24px;
+    letter-spacing: 2px;
+    margin: 56px 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wyh_section_title::before {
+    content: "";
+    width: 6px;
+    height: 24px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #2f6df6, #63e6be);
+}
+
+.wyh_section_desc {
+    color: #6b7690;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+/* ---------- 导航（典型元素一） ---------- */
+.wyh_nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(255, 255, 255, .92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid #e3e9f5;
+}
+
+.wyh_nav_inner {
+    display: flex;
+    align-items: center;
+    height: 64px;
+    gap: 28px;
+}
+
+.wyh_logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #2f6df6;
+    text-decoration: none;
+}
+
+.wyh_logo_mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #2f6df6, #63e6be);
+    color: #fff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wyh_nav_links {
+    display: flex;
+    list-style: none;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.wyh_nav_links a {
+    display: block;
+    padding: 6px 16px;
+    border-radius: 8px;
+    color: #44506b;
+    text-decoration: none;
+    font-size: 15px;
+    transition: background-color .25s, color .25s;
+}
+
+.wyh_nav_links a:hover,
+.wyh_nav_links .wyh_nav_active a {
+    background: #e8efff;
+    color: #2f6df6;
+}
+
+.wyh_nav_search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #eef2fa;
+    border: 1px solid #dfe6f3;
+    border-radius: 20px;
+    padding: 6px 14px;
+}
+
+.wyh_nav_search input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 130px;
+    font-size: 14px;
+}
+
+.wyh_nav_user {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #44506b;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ---------- 上图下文（典型元素二） ---------- */
+.wyh_card_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.wyh_card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e6ecf7;
+    box-shadow: 0 10px 26px -18px rgba(23, 43, 99, .35);
+    transition: transform .3s, box-shadow .3s;
+}
+
+.wyh_card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 22px 40px -20px rgba(23, 43, 99, .45);
+}
+
+.wyh_card img {
+    display: block;
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+}
+
+.wyh_card_body {
+    padding: 18px 20px 20px;
+}
+
+.wyh_card_body h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.wyh_card_body p {
+    font-size: 14px;
+    color: #66718c;
+    margin-bottom: 14px;
+}
+
+.wyh_card_meta {
+    display: flex;
+    gap: 18px;
+    font-size: 13px;
+    color: #8a94ad;
+}
+
+/* ---------- 左图右文（典型元素三） ---------- */
+.wyh_feature {
+    display: flex;
+    gap: 32px;
+    background: #fff;
+    border: 1px solid #e6ecf7;
+    border-radius: 16px;
+    padding: 26px;
+    align-items: center;
+}
+
+.wyh_feature_img {
+    flex: 0 0 46%;
+}
+
+.wyh_feature_img img {
+    display: block;
+    width: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.wyh_feature_text {
+    flex: 1;
+}
+
+.wyh_feature_text h3 {
+    font-size: 22px;
+    margin-bottom: 12px;
+}
+
+.wyh_feature_text p {
+    color: #5c6884;
+    font-size: 15px;
+    margin-bottom: 16px;
+}
+
+.wyh_feature_points {
+    list-style: none;
+    margin-bottom: 22px;
+}
+
+.wyh_feature_points li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #44506b;
+    padding: 5px 0;
+}
+
+.wyh_feature_points .wyh_dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2f6df6, #63e6be);
+    flex: none;
+}
+
+.wyh_btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 26px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2f6df6, #5b93ff);
+    color: #fff;
+    text-decoration: none;
+    font-size: 15px;
+    transition: transform .25s, box-shadow .25s;
+}
+
+.wyh_btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -10px rgba(47, 109, 246, .6);
+}
+
+.wyh_btn .wyh_icon {
+    filter: brightness(0) invert(1);
+}
+
+/* ---------- 一左一右（典型元素四） ---------- */
+.wyh_split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+}
+
+.wyh_split_panel {
+    background: #fff;
+    border: 1px solid #e6ecf7;
+    border-radius: 16px;
+    padding: 22px 24px;
+}
+
+.wyh_panel_head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.wyh_panel_head h3 {
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wyh_panel_head a {
+    font-size: 13px;
+    color: #2f6df6;
+    text-decoration: none;
+}
+
+.wyh_news_img {
+    width: 100%;
+    border-radius: 12px;
+    display: block;
+    margin-bottom: 14px;
+    object-fit: cover;
+    height: 220px;
+}
+
+.wyh_news_caption {
+    font-size: 14px;
+    color: #5c6884;
+}
+
+.wyh_list {
+    list-style: none;
+}
+
+.wyh_list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 4px;
+    border-bottom: 1px dashed #e6ecf7;
+    font-size: 14px;
+    color: #33405e;
+}
+
+.wyh_list li:last-child {
+    border-bottom: none;
+}
+
+.wyh_list .wyh_list_no {
+    width: 24px;
+    height: 24px;
+    flex: none;
+    border-radius: 7px;
+    background: #e8efff;
+    color: #2f6df6;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wyh_list time {
+    margin-left: auto;
+    color: #97a1b8;
+    font-size: 13px;
+    flex: none;
+}
+
+/* ---------- 页脚 ---------- */
+.wyh_footer {
+    margin-top: 64px;
+    background: #1d2540;
+    color: #aeb8d4;
+    padding: 30px 0;
+    font-size: 14px;
+}
+
+.wyh_footer_inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 36px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wyh_footer span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wyh_footer .wyh_icon {
+    filter: brightness(0) invert(.8);
+}
+
+/* ---------- 小屏适配 ---------- */
+@media (max-width: 860px) {
+    .wyh_nav_search,
+    .wyh_nav_user {
+        display: none;
+    }
+
+    .wyh_feature {
+        flex-direction: column;
+    }
+
+    .wyh_feature_img {
+        flex: none;
+        width: 100%;
+    }
+
+    .wyh_split {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== 导航 ==================== -->
+<nav class="wyh_nav">
+    <div class="wyh_container wyh_nav_inner">
+        <a class="wyh_logo" href="index.html">
+            <span class="wyh_logo_mark">智</span>智慧校园
+        </a>
+        <ul class="wyh_nav_links">
+            <li class="wyh_nav_active"><a href="#wyh_cards">校园概览</a></li>
+            <li><a href="#wyh_feature">建设动态</a></li>
+            <li><a href="#wyh_split">服务信息</a></li>
+            <li><a href="#wyh_footer">联系我们</a></li>
+        </ul>
+        <label class="wyh_nav_search">
+            <img class="wyh_icon" src="../../font/wyh_icon_search.svg" alt="搜索">
+            <input type="search" placeholder="搜索校园信息" aria-label="搜索校园信息">
+        </label>
+        <span class="wyh_nav_user">
+            <img class="wyh_icon" src="../../font/wyh_icon_user.svg" alt="用户">王云鹤
+        </span>
+    </div>
+</nav>
+
+<main class="wyh_container">
+
+    <!-- ==================== 上图下文 ==================== -->
+    <h2 class="wyh_section_title" id="wyh_cards">上图下文 · 校园名片</h2>
+    <p class="wyh_section_desc">典型元素：图片在上、文字在下的卡片列表，grid 三列自适应。</p>
+    <section class="wyh_card_grid">
+        <article class="wyh_card">
+            <img src="images/wyh_card1.jpg" alt="数字校园主楼">
+            <div class="wyh_card_body">
+                <h3>数字校园主楼</h3>
+                <p>一站式办事大厅入驻 120 余项服务，师生校内事务“只跑一次”。</p>
+                <div class="wyh_card_meta">
+                    <span><img class="wyh_icon" src="../../font/wyh_icon_location.svg" alt="位置">博雅广场 1 号</span>
+                    <span><img class="wyh_icon" src="../../font/wyh_icon_clock.svg" alt="时间">8:30–17:30</span>
+                </div>
+            </div>
+        </article>
+        <article class="wyh_card">
+            <img src="images/wyh_card2.jpg" alt="智慧图书馆">
+            <div class="wyh_card_body">
+                <h3>智慧图书馆</h3>
+                <p>纸电一体馆藏 180 万册，座位预约、刷脸入馆、24 小时自习区。</p>
+                <div class="wyh_card_meta">
+                    <span><img class="wyh_icon" src="../../font/wyh_icon_book.svg" alt="藏书">180 万册</span>
+                    <span><img class="wyh_icon" src="../../font/wyh_icon_clock.svg" alt="时间">全天开放</span>
+                </div>
+            </div>
+        </article>
+        <article class="wyh_card">
+            <img src="images/wyh_card3.jpg" alt="软件工程实验室">
+            <div class="wyh_card_body">
+                <h3>软件工程实验室</h3>
+                <p>与企业共建实训环境，云桌面 + 双屏工位支撑三级、四级项目实践。</p>
+                <div class="wyh_card_meta">
+                    <span><img class="wyh_icon" src="../../font/wyh_icon_setting.svg" alt="设备">220 工位</span>
+                    <span><img class="wyh_icon" src="../../font/wyh_icon_clock.svg" alt="时间">课表开放</span>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <!-- ==================== 左图右文 ==================== -->
+    <h2 class="wyh_section_title" id="wyh_feature">左图右文 · 智慧校园建设</h2>
+    <p class="wyh_section_desc">典型元素：flex 左图右文，右侧要点列表 + 行动按钮。</p>
+    <section class="wyh_feature">
+        <div class="wyh_feature_img">
+            <img src="images/wyh_feature.jpg" alt="学生正在进行网页设计协作">
+        </div>
+        <div class="wyh_feature_text">
+            <h3>把校园“装进”一块屏幕</h3>
+            <p>学院持续推进智慧校园建设：统一身份认证、一码通行、教学看板与生活服务全部线上化，
+               网页端与移动端共用同一套组件规范，前端课程的项目成果可直接接入校园服务门户。</p>
+            <ul class="wyh_feature_points">
+                <li><span class="wyh_dot"></span>统一门户：教务、后勤、图书馆一站直达</li>
+                <li><span class="wyh_dot"></span>组件规范：flex / grid 布局，语义化 HTML</li>
+                <li><span class="wyh_dot"></span>项目驱动：三级、四级项目成果进课堂进企业</li>
+            </ul>
+            <a class="wyh_btn" href="#wyh_split">了解更多
+                <img class="wyh_icon" src="../../font/wyh_icon_arrow.svg" alt="">
+            </a>
+        </div>
+    </section>
+
+    <!-- ==================== 一左一右 ==================== -->
+    <h2 class="wyh_section_title" id="wyh_split">一左一右 · 公告与服务</h2>
+    <p class="wyh_section_desc">典型元素：左右两栏对称布局，左图右列表。</p>
+    <section class="wyh_split">
+        <div class="wyh_split_panel">
+            <div class="wyh_panel_head">
+                <h3><img class="wyh_icon" src="../../font/wyh_icon_book.svg" alt="">校园聚焦</h3>
+                <a href="#wyh_cards">更多 →</a>
+            </div>
+            <img class="wyh_news_img" src="images/wyh_news.jpg" alt="黄昏时的校园鸟瞰">
+            <p class="wyh_news_caption">黄昏的博雅广场与教学楼群。本学期“智慧校园开放周”将集中展示学生前端项目成果，
+               网页元素设计、图像解决方案等四级项目作品将在主楼大厅布展。</p>
+        </div>
+        <div class="wyh_split_panel">
+            <div class="wyh_panel_head">
+                <h3><img class="wyh_icon" src="../../font/wyh_icon_setting.svg" alt="">服务通知</h3>
+                <a href="#wyh_cards">更多 →</a>
+            </div>
+            <ul class="wyh_list">
+                <li><span class="wyh_list_no">1</span>图书馆座位预约系统升级，新增到馆自动签到<span class="wyh_time">10-21</span></li>
+                <li><span class="wyh_list_no">2</span>软件工程实验室云桌面维护，周二 8:00–10:00 暂停服务<span class="wyh_time">10-18</span></li>
+                <li><span class="wyh_list_no">3</span>校园网新版统一认证上线，旧密码将于月底失效<span class="wyh_time">10-15</span></li>
+                <li><span class="wyh_list_no">4</span>“智慧校园开放周”作品征集启动，面向全体本科生<span class="wyh_time">10-12</span></li>
+                <li><span class="wyh_list_no">5</span>办事大厅新增“成绩证明自助打印”终端 6 台<span class="wyh_time">10-09</span></li>
+            </ul>
+        </div>
+    </section>
+</main>
+
+<!-- ==================== 页脚 ==================== -->
+<footer class="wyh_footer" id="wyh_footer">
+    <div class="wyh_container wyh_footer_inner">
+        <span><img class="wyh_icon" src="../../font/wyh_icon_location.svg" alt="地址">大连市旅顺口区 · 大连东软信息学院</span>
+        <span><img class="wyh_icon" src="../../font/wyh_icon_phone.svg" alt="电话">0411-8670-0000</span>
+        <span>高级网页设计I · 四级项目 · 王云鹤 0416</span>
+    </div>
+</footer>
+
+</body>
+</html>

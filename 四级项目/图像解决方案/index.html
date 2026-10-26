@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-10-22 功能：图像解决方案（字体图标固定下导航 + SVG上导航，自适应宽度） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智慧校园 · 图像解决方案（字体图标与SVG）</title>
+<!-- 个性化 iconfont：由自绘 SVG 路径生成的字体文件与帮助样式（对应 iconfont.cn 导出物） -->
+<link rel="stylesheet" href="../../font/wyh_iconfont.css">
+<style>
+/* ============ 全局公共 CSS ============ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #f3f6fc;
+    color: #1e2536;
+    line-height: 1.7;
+    /* 为固定下导航预留空间 */
+    padding-bottom: 86px;
+}
+
+.wyh_container { width: min(1080px, 94%); margin: 0 auto; }
+
+/* SVG 精灵本身不显示 */
+.wyh_sprite { display: none; }
+
+/* 上导航图标（SVG 方案的 CSS 修饰：尺寸、描边色随 currentColor） */
+.wyh_svg_icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: -4px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ============ 上导航（SVG 图像解决方案） ============ */
+.wyh_topnav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(255, 255, 255, .94);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid #e3e9f5;
+}
+
+.wyh_topnav_inner {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    height: 62px;
+}
+
+.wyh_logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    font-weight: 700;
+    color: #2f6df6;
+    text-decoration: none;
+}
+
+.wyh_logo .wyh_svg_icon { width: 26px; height: 26px; stroke-width: 1.8; }
+
+.wyh_toplinks {
+    display: flex;
+    list-style: none;
+    gap: 4px;
+    margin-left: auto;
+}
+
+.wyh_toplinks a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    border-radius: 9px;
+    font-size: 14.5px;
+    color: #44506b;
+    text-decoration: none;
+    transition: color .25s, background-color .25s;
+}
+
+/* CSS 修饰 SVG：hover 改变 currentColor，从而改变描边色 */
+.wyh_toplinks a:hover { color: #2f6df6; background: #e8efff; }
+
+/* ============ 主体内容 ============ */
+.wyh_hero {
+    margin: 30px auto 0;
+    padding: 34px 34px 30px;
+    border-radius: 18px;
+    color: #fff;
+    background: linear-gradient(120deg, #2f6df6 0%, #5b93ff 55%, #12b886 130%);
+    box-shadow: 0 18px 36px -20px rgba(47, 109, 246, .55);
+}
+
+.wyh_hero h1 { font-size: 26px; letter-spacing: 1px; }
+.wyh_hero p { margin-top: 8px; font-size: 14.5px; opacity: .92; max-width: 62ch; }
+
+.wyh_sec_title {
+    margin: 44px 0 6px;
+    font-size: 21px;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wyh_sec_title::before {
+    content: "";
+    width: 5px;
+    height: 20px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #2f6df6, #63e6be);
+}
+
+.wyh_sec_desc { color: #6b7690; font-size: 13.5px; margin-bottom: 18px; }
+
+/* 两种图像方案对比卡 */
+.wyh_tech_grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.wyh_tech_card {
+    background: #fff;
+    border: 1px solid #e6ecf7;
+    border-radius: 16px;
+    padding: 22px 24px;
+    box-shadow: 0 10px 26px -18px rgba(23, 43, 99, .35);
+}
+
+.wyh_tech_card h3 {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 17px;
+    margin-bottom: 6px;
+}
+
+.wyh_tech_card p { font-size: 13.5px; color: #66718c; margin-bottom: 16px; }
+
+.wyh_tech_tag {
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    color: #fff;
+    background: linear-gradient(135deg, #2f6df6, #63e6be);
+}
+
+/* 演示行：CSS 修饰字体图标（font-size / color 即图像大小与颜色） */
+.wyh_demo_icons {
+    display: flex;
+    align-items: flex-end;
+    gap: 22px;
+    padding: 14px 16px;
+    border: 1px dashed #d8e2f3;
+    border-radius: 12px;
+    background: #f8faff;
+}
+
+.wyh_demo_icons figure { text-align: center; color: #44506b; }
+.wyh_demo_icons figcaption { font-size: 12px; color: #8a94ad; margin-top: 2px; }
+
+.wyh_fs16 { font-size: 16px; }
+.wyh_fs24 { font-size: 24px; }
+.wyh_fs40 { font-size: 40px; }
+.wyh_c_blue { color: #2f6df6; }
+.wyh_c_green { color: #0ca678; }
+.wyh_c_red { color: #e03131; }
+
+/* 演示行：CSS 修饰 SVG（fill / stroke / stroke-width） */
+.wyh_svg_demo .wyh_svg_big {
+    width: 40px;
+    height: 40px;
+    fill: none;
+    stroke: #2f6df6;
+    stroke-width: 1.6;
+    transition: stroke .25s, transform .25s;
+}
+
+.wyh_svg_demo .wyh_svg_big:hover { stroke: #e03131; transform: rotate(8deg) scale(1.1); }
+
+.wyh_svg_demo .wyh_svg_filled {
+    width: 40px;
+    height: 40px;
+    fill: #0ca678;
+    stroke: none;
+    transition: fill .25s;
+}
+
+.wyh_svg_demo .wyh_svg_filled:hover { fill: #feb019; }
+
+/* 快捷入口（字体图标方案在内容区的应用） */
+.wyh_apps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+}
+
+.wyh_app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 8px 16px;
+    background: #fff;
+    border: 1px solid #e6ecf7;
+    border-radius: 14px;
+    text-decoration: none;
+    color: #33405e;
+    font-size: 14px;
+    transition: transform .25s, box-shadow .25s;
+}
+
+.wyh_app:hover { transform: translateY(-4px); box-shadow: 0 14px 28px -16px rgba(23, 43, 99, .45); }
+
+.wyh_app i {
+    font-size: 30px;
+    background: linear-gradient(135deg, #2f6df6, #63e6be);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+    .wyh_app i { color: #2f6df6; -webkit-text-fill-color: currentColor; }
+}
+
+/* ============ 下导航（字体图标方案，固定 + 自适应宽度） ============ */
+.wyh_tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    display: flex;
+    background: rgba(255, 255, 255, .97);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid #e3e9f5;
+    box-shadow: 0 -8px 24px -16px rgba(16, 40, 90, .5);
+}
+
+/* flex:1 使每个 tab 自适应平分宽度 */
+.wyh_tab {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 9px 0 7px;
+    text-decoration: none;
+    color: #8a94ad;
+    font-size: 12.5px;
+    transition: color .25s, transform .25s;
+}
+
+.wyh_tab .wyh_if { font-size: 24px; line-height: 1.15; }
+
+.wyh_tab:hover { color: #2f6df6; transform: translateY(-2px); }
+
+.wyh_tab.wyh_tab_active { color: #2f6df6; font-weight: 700; }
+
+.wyh_tab.wyh_tab_active::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 26px;
+    height: 3px;
+    border-radius: 0 0 4px 4px;
+    background: linear-gradient(90deg, #2f6df6, #63e6be);
+}
+
+/* 消息角标 */
+.wyh_badge {
+    position: absolute;
+    top: 4px;
+    left: calc(50% + 8px);
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: #e03131;
+    color: #fff;
+    font-size: 11px;
+    line-height: 17px;
+    text-align: center;
+    font-weight: 400;
+}
+
+/* ============ 页脚 ============ */
+.wyh_footer {
+    margin-top: 52px;
+    padding: 22px 0;
+    background: #1d2540;
+    color: #aeb8d4;
+    font-size: 13.5px;
+    text-align: center;
+}
+
+/* ============ 自适应：小视口 ============ */
+@media (max-width: 720px) {
+    .wyh_toplinks span { display: none; }   /* 上导航只留图标 */
+    .wyh_tech_grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 420px) {
+    .wyh_tab { font-size: 11px; }
+    .wyh_tab .wyh_if { font-size: 21px; }
+    .wyh_hero { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== SVG 精灵（symbol + use 复用） ==================== -->
+<svg class="wyh_sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="wyh_s_home" viewBox="0 0 24 24">
+        <path d="M4 11.5 12 4.5l8 7"/><path d="M6.5 10v9.5h11V10"/>
+    </symbol>
+    <symbol id="wyh_s_book" viewBox="0 0 24 24">
+        <path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2V5z"/>
+        <path d="M20 5a2 2 0 0 0-2-2h-5v18h5a2 2 0 0 0 2-2V5z"/>
+    </symbol>
+    <symbol id="wyh_s_grid" viewBox="0 0 24 24">
+        <rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/>
+        <rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>
+    </symbol>
+    <symbol id="wyh_s_bell" viewBox="0 0 24 24">
+        <path d="M6 16V10a6 6 0 0 1 12 0v6l1.8 2.5H4.2z"/><path d="M10 21a2 2 0 0 0 4 0"/>
+    </symbol>
+    <symbol id="wyh_s_user" viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6"/>
+    </symbol>
+    <symbol id="wyh_s_search" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/>
+    </symbol>
+    <symbol id="wyh_s_star" viewBox="0 0 24 24">
+        <path d="M12 2.4 14.85 8.35 21.4 9.3 16.65 13.9 17.8 20.45 12 17.3 6.2 20.45 7.35 13.9 2.6 9.3 9.15 8.35Z"/>
+    </symbol>
+</svg>
+
+<!-- ==================== 上导航：SVG 图像解决方案 ==================== -->
+<header class="wyh_topnav">
+    <div class="wyh_container wyh_topnav_inner">
+        <a class="wyh_logo" href="index.html">
+            <svg class="wyh_svg_icon"><use href="#wyh_s_home"/></svg>智慧校园
+        </a>
+        <ul class="wyh_toplinks">
+            <li><a href="#wyh_tech"><svg class="wyh_svg_icon"><use href="#wyh_s_home"/></svg><span>首页</span></a></li>
+            <li><a href="#wyh_tech"><svg class="wyh_svg_icon"><use href="#wyh_s_book"/></svg><span>图书馆</span></a></li>
+            <li><a href="#wyh_apps"><svg class="wyh_svg_icon"><use href="#wyh_s_grid"/></svg><span>服务</span></a></li>
+            <li><a href="#wyh_apps"><svg class="wyh_svg_icon"><use href="#wyh_s_bell"/></svg><span>消息</span></a></li>
+            <li><a href="#wyh_apps"><svg class="wyh_svg_icon"><use href="#wyh_s_user"/></svg><span>我的</span></a></li>
+            <li><a href="#wyh_tech" aria-label="搜索"><svg class="wyh_svg_icon"><use href="#wyh_s_search"/></svg></a></li>
+        </ul>
+    </div>
+</header>
+
+<main class="wyh_container">
+
+    <section class="wyh_hero">
+        <h1>图像解决方案 · 字体图标与 SVG</h1>
+        <p>本页为四级项目"图像解决方案"：上导航采用 <b>SVG（symbol 精灵 + use 复用，CSS 控制描边颜色与尺寸）</b>；
+           下导航采用 <b>个性化字体图标（自绘路径生成的 iconfont 字体文件，CSS 通过 font-size / color 修饰）</b>，
+           两种技术互相区别。下导航固定在页面底部，flex:1 自适应宽度，多视口下均正常显示。</p>
+    </section>
+
+    <h2 class="wyh_sec_title" id="wyh_tech">两种图像技术对比演示</h2>
+    <p class="wyh_sec_desc">同一组图标，分别用字体图标与 SVG 实现，并用 CSS 修饰其大小与颜色。</p>
+
+    <section class="wyh_tech_grid">
+        <div class="wyh_tech_card">
+            <h3><span class="wyh_tech_tag">方案一</span>字体图标（iconfont）</h3>
+            <p>由自绘 SVG 路径生成的个性化字体文件（wyh_iconfont.ttf / .woff），图标即字符：
+               CSS 用 font-size 改大小、color 改颜色。用于本页下导航。</p>
+            <div class="wyh_demo_icons">
+                <figure><i class="wyh_if wyh_if_home wyh_fs16"></i><figcaption>16px</figcaption></figure>
+                <figure><i class="wyh_if wyh_if_book wyh_fs24 wyh_c_blue"></i><figcaption>24px</figcaption></figure>
+                <figure><i class="wyh_if wyh_if_bell wyh_fs40 wyh_c_green"></i><figcaption>40px</figcaption></figure>
+                <figure><i class="wyh_if wyh_if_star wyh_fs40 wyh_c_red"></i><figcaption>color</figcaption></figure>
+                <figure><i class="wyh_if wyh_if_grid wyh_fs40 wyh_c_blue"></i><figcaption>color</figcaption></figure>
+            </div>
+        </div>
+        <div class="wyh_tech_card">
+            <h3><span class="wyh_tech_tag">方案二</span>SVG（symbol + use）</h3>
+            <p>页面顶部内联 SVG 精灵，<b>&lt;use&gt;</b> 按需复用；CSS 可直接修饰描边（stroke）、填充（fill）与线宽，
+               支持悬停变色、旋转等更精细的控制。用于本页上导航。</p>
+            <div class="wyh_demo_icons wyh_svg_demo">
+                <figure><svg class="wyh_svg_big"><use href="#wyh_s_home"/></svg><figcaption>stroke 修饰</figcaption></figure>
+                <figure><svg class="wyh_svg_big"><use href="#wyh_s_bell"/></svg><figcaption>hover 变红</figcaption></figure>
+                <figure><svg class="wyh_svg_filled"><use href="#wyh_s_star"/></svg><figcaption>fill 修饰</figcaption></figure>
+                <figure><svg class="wyh_svg_filled"><use href="#wyh_s_grid"/></svg><figcaption>hover 变黄</figcaption></figure>
+            </div>
+        </div>
+    </section>
+
+    <h2 class="wyh_sec_title" id="wyh_apps">校园服务快捷入口（字体图标）</h2>
+    <p class="wyh_sec_desc">字体图标同样可用于内容区：栅格自适应排列，悬停上浮。</p>
+
+    <section class="wyh_apps">
+        <a class="wyh_app" href="#wyh_tech"><i class="wyh_if wyh_if_home"></i>校园首页</a>
+        <a class="wyh_app" href="#wyh_tech"><i class="wyh_if wyh_if_book"></i>图书馆</a>
+        <a class="wyh_app" href="#wyh_tech"><i class="wyh_if wyh_if_grid"></i>办事大厅</a>
+        <a class="wyh_app" href="#wyh_tech"><i class="wyh_if wyh_if_bell"></i>校园消息</a>
+        <a class="wyh_app" href="#wyh_tech"><i class="wyh_if wyh_if_star"></i>我的收藏</a>
+        <a class="wyh_app" href="#wyh_tech"><i class="wyh_if wyh_if_user"></i>个人中心</a>
+    </section>
+
+</main>
+
+<footer class="wyh_footer">
+    高级网页设计I · 四级项目 · 图像解决方案 · 王云鹤 0416 · 上导航 SVG / 下导航 字体图标
+</footer>
+
+<!-- ==================== 下导航：字体图标方案，固定 + 自适应宽度 ==================== -->
+<nav class="wyh_tabbar" aria-label="校园下导航">
+    <a class="wyh_tab wyh_tab_active" href="#wyh_tech">
+        <i class="wyh_if wyh_if_home"></i>首页
+    </a>
+    <a class="wyh_tab" href="#wyh_tech">
+        <i class="wyh_if wyh_if_book"></i>图书馆
+    </a>
+    <a class="wyh_tab" href="#wyh_apps">
+        <i class="wyh_if wyh_if_grid"></i>服务
+    </a>
+    <a class="wyh_tab" href="#wyh_apps">
+        <i class="wyh_if wyh_if_bell"></i>消息
+        <span class="wyh_badge">3</span>
+    </a>
+    <a class="wyh_tab" href="#wyh_apps">
+        <i class="wyh_if wyh_if_user"></i>我的
+    </a>
+</nav>
+
+</body>
+</html>
