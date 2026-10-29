@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-10-29 功能：股票行情选项卡（tab 可点击切换） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沪深行情 · 选项卡</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        .wyh_body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #eef0f2;
+            padding: 40px 16px;
+            gap: 22px;
+        }
+
+        /* ---------- 表格容器 ---------- */
+        .wyh_table {
+            width: 480px;
+            max-width: 100%;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            border-collapse: collapse;
+            box-shadow: 0 6px 18px rgba(30, 40, 60, .08);
+        }
+
+        /* ---------- 选项卡行 ---------- */
+        .wyh_tabs { display: flex; border-bottom: 1px solid #d9d9d9; }
+
+        .wyh_tab {
+            flex: 1;
+            border: none;
+            border-right: 1px solid #e4e4e4;
+            background: #fbfbfb;
+            padding: 11px 0;
+            font-family: inherit;
+            font-size: 15.5px;
+            color: #2b6cd4;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background .15s ease, color .15s ease;
+        }
+
+        .wyh_tab:last-child { border-right: none; }
+
+        .wyh_tab:hover { background: #f2f6ff; }
+
+        .wyh_tab_active {
+            background: #fff;
+            color: #1f1f1f;
+            font-weight: bold;
+            cursor: default;
+        }
+
+        .wyh_tab_active:hover { background: #fff; }
+
+        /* 涨/跌箭头图标（font 目录 SVG 遮罩着色） */
+        .wyh_tab_ic {
+            width: 14px;
+            height: 14px;
+            background-color: currentColor;
+            -webkit-mask: url("../font/wyh_icon_arrow.svg") no-repeat center / contain;
+            mask: url("../font/wyh_icon_arrow.svg") no-repeat center / contain;
+            flex: none;
+        }
+
+        .wyh_tab_up .wyh_tab_ic   { transform: rotate(-90deg); }
+        .wyh_tab_down .wyh_tab_ic { transform: rotate(90deg); }
+
+        /* ---------- 数据行 ---------- */
+        .wyh_rows { list-style: none; }
+
+        .wyh_row {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ededed;
+            padding: 9px 14px;
+            font-size: 14.5px;
+            color: #222;
+            animation: wyh_fade .25s ease backwards;
+        }
+
+        .wyh_row:last-child { border-bottom: none; }
+
+        .wyh_row:hover { background: #fafcff; }
+
+        @keyframes wyh_fade {
+            from { opacity: 0; transform: translateY(4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .wyh_no   { width: 34px; color: #e03131; font-weight: bold; flex: none; }
+        .wyh_name { flex: 1.4; text-align: left; }
+        .wyh_now  { flex: 1; text-align: right; }
+        .wyh_chg  { flex: 1; text-align: right; }
+        .wyh_pct  { flex: 1; text-align: right; }
+
+        .wyh_up   { color: #d92b2b; }
+        .wyh_down { color: #0a8f4d; }
+
+        .wyh_foot { color: #8a93a3; font-size: 12.5px; text-align: center; }
+
+        @media (max-width: 520px) {
+            .wyh_row { padding: 8px 8px; font-size: 13px; }
+            .wyh_tab { font-size: 14px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .wyh_row, .wyh_tab { animation: none; transition: none; }
+        }
+    </style>
+</head>
+<body class="wyh_body">
+    <div class="wyh_table" role="tablist" aria-label="沪深行情切换">
+        <div class="wyh_tabs" id="wyh_tabs"></div>
+        <ul class="wyh_rows" id="wyh_rows"></ul>
+    </div>
+
+    <p class="wyh_foot">王云鹤 · 学号 0416 · 计算机24006 · 高级网页设计 16-4 ｜ 点击选项卡切换行情</p>
+
+    <script>
+        (function () {
+            'use strict';
+
+            /* 行情数据：涨为红、跌为绿 */
+            var wyh_data = {
+                '沪涨': { dir: 'up',   list: [
+                    ['N能新',   '8.88',  '+3.35', '60.58%'],
+                    ['天津松江', '8.16',  '+0.65', '8.66%'],
+                    ['金瑞科技', '8.79',  '+0.42', '5.02%'],
+                    ['宏发股份', '17.22', '+0.82', '5.00%'],
+                    ['杭齿前进', '7.23',  '+0.34', '4.93%']
+                ] },
+                '沪跌': { dir: 'down', list: [
+                    ['中国船舶', '32.15', '-0.86', '2.61%'],
+                    ['保利地产', '15.72', '-0.43', '2.66%'],
+                    ['上汽集团', '18.36', '-0.51', '2.70%'],
+                    ['工商银行', '5.02',  '-0.09', '1.76%'],
+                    ['万科A',    '8.94',  '-0.21', '2.29%']
+                ] },
+                '深涨': { dir: 'up',   list: [
+                    ['天顺风能', '10.52', '+0.96', '10.04%'],
+                    ['兴源过滤', '16.02', '+1.46', '10.03%'],
+                    ['北京君正', '36.92', '+3.36', '10.01%'],
+                    ['美盛文化', '32.87', '+2.99', '10.01%'],
+                    ['骅威股份', '15.16', '+1.38', '10.01%']
+                ] },
+                '深跌': { dir: 'down', list: [
+                    ['东方财富', '14.28', '-0.66', '4.41%'],
+                    ['苏宁云商', '11.05', '-0.52', '4.49%'],
+                    ['比亚迪',   '46.30', '-2.15', '4.43%'],
+                    ['洋河股份', '66.80', '-3.11', '4.44%'],
+                    ['海普瑞',   '13.95', '-0.68', '4.64%']
+                ] }
+            };
+
+            var wyh_tabsBox = document.getElementById('wyh_tabs');
+            var wyh_rowsBox = document.getElementById('wyh_rows');
+            var wyh_names = ['沪涨', '沪跌', '深涨', '深跌'];
+            var wyh_active = '沪涨';
+
+            /* 渲染选项卡 */
+            wyh_names.forEach(function (wyh_name) {
+                var wyh_btn = document.createElement('button');
+                wyh_btn.type = 'button';
+                wyh_btn.setAttribute('role', 'tab');
+                wyh_btn.className = 'wyh_tab wyh_tab_' + wyh_data[wyh_name].dir;
+                wyh_btn.innerHTML = '<span class="wyh_tab_ic"></span>' + wyh_name;
+                wyh_btn.addEventListener('click', function () {
+                    if (wyh_active === wyh_name) return;
+                    wyh_active = wyh_name;
+                    wyh_render();
+                });
+                wyh_tabsBox.appendChild(wyh_btn);
+            });
+
+            /* 渲染当前选项卡的数据行 */
+            function wyh_render() {
+                var wyh_tabBtns = wyh_tabsBox.children;
+                for (var wyh_i = 0; wyh_i < wyh_tabBtns.length; wyh_i++) {
+                    var wyh_on = wyh_names[wyh_i] === wyh_active;
+                    wyh_tabBtns[wyh_i].classList.toggle('wyh_tab_active', wyh_on);
+                    wyh_tabBtns[wyh_i].setAttribute('aria-selected', wyh_on ? 'true' : 'false');
+                }
+
+                var wyh_d = wyh_data[wyh_active];
+                wyh_rowsBox.innerHTML = '';
+                wyh_d.list.forEach(function (wyh_item, wyh_idx) {
+                    var wyh_li = document.createElement('li');
+                    wyh_li.className = 'wyh_row';
+                    wyh_li.style.animationDelay = (wyh_idx * 0.04) + 's';
+                    wyh_li.innerHTML =
+                        '<span class="wyh_no">' + (wyh_idx + 1) + '.</span>' +
+                        '<span class="wyh_name">' + wyh_item[0] + '</span>' +
+                        '<span class="wyh_now">' + wyh_item[1] + '</span>' +
+                        '<span class="wyh_chg wyh_' + wyh_d.dir + '">' + wyh_item[2] + '</span>' +
+                        '<span class="wyh_pct wyh_' + wyh_d.dir + '">' + wyh_item[3] + '</span>';
+                    wyh_rowsBox.appendChild(wyh_li);
+                });
+            }
+
+            wyh_render();
+        })();
+    </script>
+</body>
+</html>
