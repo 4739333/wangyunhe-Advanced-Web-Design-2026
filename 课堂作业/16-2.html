@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-10-29 功能：JavaScript 对象与字符串可视化演示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 对象与字符串演示</title>
+    <link rel="stylesheet" href="../font/wyh_iconfont.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            color: #e8ebf7;
+            padding: 48px 20px 70px;
+            line-height: 1.7;
+        }
+
+        .wyh_container { max-width: 1120px; margin: 0 auto; }
+
+        .wyh_title {
+            text-align: center;
+            font-size: 34px;
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, #b48cff, #7ab8ff, #63e6be);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .wyh_subtitle {
+            text-align: center;
+            color: #93a0c8;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 26px;
+        }
+
+        /* ---------- 图例 ---------- */
+        .wyh_legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 18px;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 14px;
+            margin-bottom: 40px;
+            font-size: 13px;
+            color: #b9c3e2;
+        }
+        .wyh_legend_item { display: inline-flex; align-items: center; gap: 8px; }
+        .wyh_dot { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+        .wyh_dot_keep { background: #3b4a6b; }
+        .wyh_dot_add  { background: #2fbf71; }
+        .wyh_dot_del  { background: #e5484d; opacity: .55; }
+        .wyh_dot_hit  { background: #f5b83d; }
+        .wyh_dot_move { background: #7ab8ff; }
+
+        /* ---------- 分组标题 ---------- */
+        .wyh_section { margin-bottom: 44px; }
+        .wyh_section_head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed rgba(255, 255, 255, .15);
+        }
+        .wyh_section_head i { font-size: 24px; color: var(--wyh_sec, #b48cff); }
+        .wyh_section_head h2 { font-size: 22px; letter-spacing: 2px; color: var(--wyh_sec, #b48cff); }
+        .wyh_section_head span { color: #93a0c8; font-size: 13px; margin-left: auto; }
+        .wyh_sec_obj { --wyh_sec: #b48cff; }
+        .wyh_sec_str { --wyh_sec: #63e6be; }
+
+        /* ---------- 方法卡片 ---------- */
+        .wyh_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 20px;
+        }
+        .wyh_card {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 16px;
+            padding: 20px 22px;
+            position: relative;
+            overflow: hidden;
+            transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+        }
+        .wyh_card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: var(--wyh_sec, #b48cff);
+        }
+        .wyh_card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, .25);
+            box-shadow: 0 14px 34px rgba(0, 0, 0, .4);
+        }
+        .wyh_card_head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .wyh_m_name {
+            font-size: 18px;
+            font-family: Consolas, "Courier New", monospace;
+            color: var(--wyh_sec, #b48cff);
+            letter-spacing: .5px;
+        }
+        .wyh_tag {
+            font-size: 11.5px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--wyh_sec, #b48cff);
+            color: var(--wyh_sec, #b48cff);
+            white-space: nowrap;
+        }
+        .wyh_tag_new { border-color: #2fbf71; color: #2fbf71; }
+        .wyh_m_desc { font-size: 13.5px; color: #b9c3e2; margin-bottom: 12px; }
+        .wyh_m_code {
+            background: rgba(0, 0, 0, .35);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            color: #c9e3ff;
+            margin-bottom: 14px;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* ---------- 可视化盒子 ---------- */
+        .wyh_viz {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 52px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+        .wyh_chip {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            animation: wyh_pop .35s ease backwards;
+        }
+        .wyh_chip em {
+            font-style: normal;
+            font-size: 10px;
+            color: #7d8bb0;
+            font-family: Consolas, monospace;
+        }
+        .wyh_chip b {
+            min-width: 34px;
+            height: 32px;
+            padding: 0 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: Consolas, monospace;
+            background: #3b4a6b;
+            color: #e8ebf7;
+            border: 1px solid rgba(255, 255, 255, .12);
+            transition: all .3s ease;
+        }
+        /* 键值胶囊：key 小标签 + value 盒子 */
+        .wyh_chip_kv b {
+            flex-direction: row;
+            gap: 6px;
+            min-width: 90px;
+            padding: 0 10px;
+        }
+        .wyh_chip_kv b i {
+            font-style: normal;
+            font-size: 11px;
+            color: #9db4e8;
+            border-right: 1px solid rgba(255, 255, 255, .18);
+            padding-right: 6px;
+        }
+        .wyh_chip_space b { background: #232c4a; color: #5c6a92; }
+
+        .wyh_chip_add  b { background: rgba(47, 191, 113, .25); border-color: #2fbf71; color: #7ff0b2; }
+        .wyh_chip_del  b { background: rgba(229, 72, 77, .18); border-color: #e5484d; color: #ff9b9e; text-decoration: line-through; opacity: .6; }
+        .wyh_chip_hit  b { background: rgba(245, 184, 61, .25); border-color: #f5b83d; color: #ffd98a; box-shadow: 0 0 12px rgba(245, 184, 61, .35); }
+        .wyh_chip_move b { background: rgba(122, 184, 255, .25); border-color: #7ab8ff; color: #bfe0ff; }
+        .wyh_chip_dim  b { opacity: .28; }
+
+        .wyh_arrow {
+            align-self: center;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            color: #7d8bb0;
+            font-size: 16px;
+            padding: 0 2px;
+        }
+
+        @keyframes wyh_pop {
+            from { transform: scale(.4) translateY(10px); opacity: 0; }
+            to   { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        /* ---------- 结果区 ---------- */
+        .wyh_m_result {
+            background: rgba(0, 0, 0, .25);
+            border-left: 3px solid var(--wyh_sec, #b48cff);
+            border-radius: 0 10px 10px 0;
+            padding: 9px 13px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12.5px;
+            color: #d5e2ff;
+            white-space: pre-wrap;
+            word-break: break-all;
+            min-height: 40px;
+            margin-bottom: 14px;
+        }
+        .wyh_m_result.wyh_idle { color: #6b7899; font-family: "Microsoft YaHei", sans-serif; }
+
+        /* ---------- 按钮 ---------- */
+        .wyh_btns { display: flex; gap: 10px; }
+        .wyh_btn {
+            flex: 1;
+            padding: 8px 0;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            color: #fff;
+            transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
+        }
+        .wyh_btn:active { transform: scale(.9); }
+        .wyh_btn:hover { filter: brightness(1.15); }
+        .wyh_btn_run {
+            background: linear-gradient(135deg, var(--wyh_sec, #b48cff), #2f6df6);
+            box-shadow: 0 8px 18px -10px var(--wyh_sec, #b48cff);
+        }
+        .wyh_btn_reset {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .15);
+            color: #b9c3e2;
+        }
+        .wyh_btn_reset:hover { color: #fff; border-color: rgba(255, 255, 255, .35); }
+
+        .wyh_foot {
+            text-align: center;
+            color: #6b7899;
+            font-size: 13px;
+            margin-top: 30px;
+            padding-top: 22px;
+            border-top: 1px dashed rgba(255, 255, 255, .12);
+        }
+
+        @media (max-width: 640px) {
+            .wyh_title { font-size: 26px; }
+            .wyh_section_head span { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .wyh_chip { animation: none; }
+            .wyh_card, .wyh_btn { transition: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wyh_container">
+        <h1 class="wyh_title">JavaScript 对象与字符串</h1>
+        <p class="wyh_subtitle">对象 = 键值对胶囊集合，字符串 = 一格一字符的盒子 —— 点击「▶ 运行」观察变化</p>
+
+        <div class="wyh_legend">
+            <span class="wyh_legend_item"><span class="wyh_dot wyh_dot_keep"></span>原内容</span>
+            <span class="wyh_legend_item"><span class="wyh_dot wyh_dot_add"></span>新增</span>
+            <span class="wyh_legend_item"><span class="wyh_dot wyh_dot_del"></span>被删除</span>
+            <span class="wyh_legend_item"><span class="wyh_dot wyh_dot_hit"></span>命中 / 选中</span>
+            <span class="wyh_legend_item"><span class="wyh_dot wyh_dot_move"></span>变化后</span>
+        </div>
+
+        <div id="wyh_app"></div>
+
+        <footer class="wyh_foot">
+            王云鹤 · 学号 0416 · 计算机24006 · 高级网页设计 16-2 ｜ 原生 HTML / CSS / JavaScript，无 CDN
+        </footer>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            /* ---------- 基础数据 ---------- */
+            var wyh_obj = { sid: '0416', name: '王云鹤', cls: '计科24006' };
+            var wyh_str = 'JavaScript';
+
+            /* 可视元素类型：kv 键值胶囊 / ch 字符盒子 / ar 箭头分隔 */
+            function wyh_kv(o, s) {
+                return Object.keys(o).map(function (k) { return { t: 'kv', k: k, v: o[k], s: s || 'keep' }; });
+            }
+            function wyh_ch(str, s, from) {
+                var out = [];
+                for (var i = 0; i < str.length; i++) {
+                    out.push({ t: 'ch', v: str[i], s: s || 'keep', i: (from || 0) + i });
+                }
+                return out;
+            }
+
+            var wyh_groups = [
+                { id: 'obj', icon: 'wyh_if_user', name: '对象 Object', note: '键值对的集合，引用类型', cls: 'wyh_sec_obj' },
+                { id: 'str', icon: 'wyh_if_book', name: '字符串 String', note: '不可变的字符序列，下标从 0 开始', cls: 'wyh_sec_str' }
+            ];
+
+            var wyh_methods = [
+                /* ===== 对象 ===== */
+                { cat: 'obj', name: '对象字面量', tag: '引用类型',
+                  desc: '用 { 键: 值 } 创建对象，键是名字、值是任意数据。',
+                  code: "let stu = {sid:'0416', name:'王云鹤', cls:'计科24006'};",
+                  run: function () {
+                      return { viz: wyh_kv(wyh_obj), result: "typeof stu → 'object'\n对象像一本通讯录：每个名字（键）对应一条信息（值）" };
+                  } },
+                { cat: 'obj', name: '属性访问', tag: '读取',
+                  desc: '点号 stu.name 或方括号 stu[\'cls\'] 都能取值。',
+                  code: "stu.name;  stu['cls'];  stu.age",
+                  run: function () {
+                      var c = wyh_kv(wyh_obj);
+                      c[1].s = 'hit'; c[2].s = 'hit';
+                      return { viz: c, result: "stu.name → '王云鹤'，stu['cls'] → '计科24006'\n访问不存在的键 stu.age → undefined" };
+                  } },
+                { cat: 'obj', name: '新增 / 修改', tag: '改原对象',
+                  desc: '赋一个新键即新增，赋已有键即修改其值。',
+                  code: "stu.major = '计算机';",
+                  run: function () {
+                      var c = wyh_kv(wyh_obj);
+                      c.push({ t: 'kv', k: 'major', v: '计算机', s: 'add' });
+                      return { viz: c, result: "stu.major = '计算机' → 新增绿色键值对\nstu.sid = '0417' → 已有键则覆盖旧值" };
+                  } },
+                { cat: 'obj', name: 'delete', tag: '改原对象',
+                  desc: '删除对象中的某个键值对。',
+                  code: "delete stu.cls;",
+                  run: function () {
+                      var c = wyh_kv(wyh_obj);
+                      c[2].s = 'del';
+                      return { viz: c, result: "删除后 stu → {sid:'0416', name:'王云鹤'}\n'delete' 返回 true，键彻底消失" };
+                  } },
+                { cat: 'obj', name: 'in / hasOwnProperty', tag: '返回布尔',
+                  desc: '判断键是否存在：in 会查原型链，hasOwnProperty 只查自身。',
+                  code: "'sid' in stu;  stu.hasOwnProperty('toString')",
+                  run: function () {
+                      var c = wyh_kv(wyh_obj);
+                      c[0].s = 'hit';
+                      return { viz: c, result: "'sid' in stu → true\nstu.hasOwnProperty('toString') → false（那是原型上的）" };
+                  } },
+                { cat: 'obj', name: 'for...in', tag: '遍历',
+                  desc: '依次取出对象的每个键名，再用键去取值。',
+                  code: "for (let k in stu) console.log(k, stu[k]);",
+                  run: function () {
+                      var c = wyh_kv(wyh_obj);
+                      c.forEach(function (x) { x.s = 'hit'; });
+                      return { viz: c, result: "sid 0416\nname 王云鹤\ncls 计科24006\n（k 是键，stu[k] 是值）" };
+                  } },
+                { cat: 'obj', name: 'Object.keys / values', tag: '返回数组',
+                  desc: '一次性拿到所有键、所有值或键值对数组。',
+                  code: "Object.keys(stu); Object.values(stu); Object.entries(stu)",
+                  run: function () {
+                      var c = wyh_kv(wyh_obj);
+                      c.forEach(function (x) { x.s = 'hit'; });
+                      return { viz: c, result: "keys   → ['sid','name','cls']\nvalues → ['0416','王云鹤','计科24006']\nentries→ [['sid','0416'], …]" };
+                  } },
+                { cat: 'obj', name: '展开合并 {…}', tag: '返回新对象',
+                  desc: '扩展运算符浅拷贝合并，生成新对象而不改原对象。',
+                  code: "let copy = {...stu, grade: 2024};",
+                  run: function () {
+                      var c = wyh_kv(wyh_obj);
+                      c.push({ t: 'ar' }, { t: 'kv', k: 'grade', v: 2024, s: 'add' });
+                      return { viz: c, result: "新对象共 4 个键，stu 本身不变\n同名键后写的覆盖先写的" };
+                  } },
+
+                /* ===== 字符串 ===== */
+                { cat: 'str', name: 'length', tag: '属性',
+                  desc: '字符个数。注意：是属性不是方法，后面不加括号。',
+                  code: "let s = 'JavaScript';  s.length",
+                  run: function () {
+                      return { viz: wyh_ch(wyh_str), result: '返回值：10（J-a-v-a-S-c-r-i-p-t 共 10 格）' };
+                  } },
+                { cat: 'str', name: 'indexOf / lastIndexOf', tag: '返回下标',
+                  desc: '查找子串首次 / 末次出现的位置，找不到返回 -1。',
+                  code: "s.indexOf('a');  s.lastIndexOf('a')",
+                  run: function () {
+                      var c = wyh_ch(wyh_str);
+                      c[1].s = 'hit'; c[3].s = 'hit';
+                      return { viz: c, result: "indexOf('a') → 1（首次）\nlastIndexOf('a') → 3（最后一次）\nindexOf('py') → -1" };
+                  } },
+                { cat: 'str', name: 'charAt / 下标', tag: '返回字符',
+                  desc: '取第 n 个字符，s.charAt(4) 与 s[4] 等价。',
+                  code: "s.charAt(4);  s[4]",
+                  run: function () {
+                      var c = wyh_ch(wyh_str);
+                      c[4].s = 'hit';
+                      return { viz: c, result: "返回值：'S'（下标从 0 开始数第 4 格）\n字符串不可变：s[0] = 'X' 无效" };
+                  } },
+                { cat: 'str', name: 'slice / substring', tag: '返回新串',
+                  desc: '截取 [开始, 结束) 区间，结束不写截到末尾。',
+                  code: "s.slice(4);  s.slice(0, 4);  s.slice(-4)",
+                  run: function () {
+                      var c = wyh_ch(wyh_str);
+                      c.forEach(function (x, i) { x.s = i >= 4 ? 'hit' : 'dim'; });
+                      return { viz: c, result: "slice(4)  → 'Script'（亮色部分）\nslice(0,4) → 'Java'\nslice(-4)  → 'ript'（负数从尾部数）" };
+                  } },
+                { cat: 'str', name: 'split()', tag: '返回数组',
+                  desc: '按分隔符把字符串切成数组；传空串则逐字拆开。',
+                  code: "s.split('');  '2026-10-29'.split('-')",
+                  run: function () {
+                      var c = wyh_ch(wyh_str);
+                      c.forEach(function (x, i) { x.s = i % 4 === 0 ? 'hit' : 'keep'; });
+                      return { viz: c, result: "s.split('') → ['J','a','v',…,'t'] 共 10 项\n'2026-10-29'.split('-') → ['2026','10','29']" };
+                  } },
+                { cat: 'str', name: 'toUpperCase / toLowerCase', tag: '返回新串',
+                  desc: '大小写转换，原字符串保持不变。',
+                  code: "s.toUpperCase();  s.toLowerCase()",
+                  run: function () {
+                      var c = wyh_ch(wyh_str.toUpperCase(), 'move');
+                      return { viz: c, result: "toUpperCase → 'JAVASCRIPT'（盒子变蓝=新串）\ntoLowerCase → 'javascript'，s 本身不变" };
+                  } },
+                { cat: 'str', name: 'replace', tag: '返回新串',
+                  desc: '把第一个匹配子串换成新内容。',
+                  code: "s.replace('a', '@')",
+                  run: function () {
+                      var c = wyh_ch(wyh_str);
+                      c[1] = { t: 'ch', v: '@', s: 'move', i: 1 };
+                      return { viz: c, result: "返回值：'J@vaScript'（只换第一个 a）\nreplaceAll('a','@') → 'J@v@Script'" };
+                  } },
+                { cat: 'str', name: 'includes / startsWith / endsWith', tag: '返回布尔',
+                  desc: '判断是否包含、以…开头、以…结尾。',
+                  code: "s.includes('Script');  s.startsWith('J');  s.endsWith('J')",
+                  run: function () {
+                      var c = wyh_ch(wyh_str);
+                      c.forEach(function (x, i) { x.s = i >= 4 ? 'hit' : 'dim'; });
+                      c[0].s = 'hit';
+                      return { viz: c, result: "includes('Script') → true\nstartsWith('J') → true\nendsWith('J') → false" };
+                  } },
+                { cat: 'str', name: 'padStart / padEnd', tag: '返回新串',
+                  desc: '把字符串补齐到指定长度，常用于编号、对齐。',
+                  code: "'7'.padStart(3, '0');  'ab'.padEnd(4, '-')",
+                  init: [{ t: 'ch', v: '7', s: 'keep', i: 0 }, { t: 'ar' },
+                         { t: 'ch', v: 'a', s: 'keep', i: 0 }, { t: 'ch', v: 'b', s: 'keep', i: 1 }],
+                  run: function () {
+                      var c = [{ t: 'ch', v: '0', s: 'add', i: 0 }, { t: 'ch', v: '0', s: 'add', i: 1 }, { t: 'ch', v: '7', s: 'keep', i: 2 }];
+                      c.push({ t: 'ar' });
+                      c.push({ t: 'ch', v: 'a', s: 'keep', i: 0 }, { t: 'ch', v: 'b', s: 'keep', i: 1 },
+                             { t: 'ch', v: '-', s: 'add', i: 2 }, { t: 'ch', v: '-', s: 'add', i: 3 });
+                      return { viz: c, result: "'7'.padStart(3,'0') → '007'（左边补）\n'ab'.padEnd(4,'-') → 'ab--'（右边补）" };
+                  } },
+                { cat: 'str', name: 'trim / repeat', tag: '返回新串',
+                  desc: 'trim 去掉首尾空白；repeat 把字符串复制 n 遍。',
+                  code: "'  hi  '.trim();  'ab'.repeat(2)",
+                  init: [{ t: 'ch', v: '␣', s: 'space', i: 0 }, { t: 'ch', v: 'h', s: 'keep', i: 1 },
+                         { t: 'ch', v: 'i', s: 'keep', i: 2 }, { t: 'ch', v: '␣', s: 'space', i: 3 }, { t: 'ar' },
+                         { t: 'ch', v: 'a', s: 'keep', i: 0 }, { t: 'ch', v: 'b', s: 'keep', i: 1 }],
+                  run: function () {
+                      var c = [{ t: 'ch', v: '␣', s: 'del', i: 0 }, { t: 'ch', v: 'h', s: 'keep', i: 1 },
+                               { t: 'ch', v: 'i', s: 'keep', i: 2 }, { t: 'ch', v: '␣', s: 'del', i: 3 }];
+                      c.push({ t: 'ar' });
+                      c = c.concat(wyh_ch('abab', 'add'));
+                      return { viz: c, result: "'  hi  '.trim() → 'hi'（空格被删）\n'ab'.repeat(2) → 'abab'" };
+                  } },
+                { cat: 'str', name: '模板字符串', tag: '反引号',
+                  desc: '反引号包裹，${ } 里直接放表达式。',
+                  code: "`学号：${stu.sid}，姓名：${stu.name}`",
+                  init: wyh_kv(wyh_obj),
+                  run: function () {
+                      var c = wyh_ch('学号：0416，姓名：王云鹤', 'hit');
+                      return { viz: c, result: "返回值：'学号：0416，姓名：王云鹤'\n${} 内可写任意表达式，如 ${1+2} → '3'" };
+                  } }
+            ];
+
+            /* ---------- 渲染 ---------- */
+            var wyh_app = document.getElementById('wyh_app');
+
+            function wyh_renderViz(box, items) {
+                box.innerHTML = '';
+                items.forEach(function (it, idx) {
+                    var el = document.createElement('span');
+                    el.style.animationDelay = (idx * 0.04) + 's';
+                    if (it.t === 'ar') {
+                        el.className = 'wyh_arrow';
+                        el.textContent = '→';
+                    } else if (it.t === 'kv') {
+                        el.className = 'wyh_chip wyh_chip_kv wyh_chip_' + it.s;
+                        el.innerHTML = '<em>' + it.k + '</em><b><i>' + it.k + '</i>' + it.v + '</b>';
+                    } else {
+                        el.className = 'wyh_chip wyh_chip_' + it.s;
+                        el.innerHTML = '<em>' + it.i + '</em><b>' + it.v + '</b>';
+                    }
+                    box.appendChild(el);
+                });
+            }
+
+            wyh_groups.forEach(function (g) {
+                var wyh_sec = document.createElement('section');
+                wyh_sec.className = 'wyh_section ' + g.cls;
+                var wyh_items = wyh_methods.filter(function (m) { return m.cat === g.id; });
+
+                wyh_sec.innerHTML =
+                    '<div class="wyh_section_head">' +
+                    '<i class="wyh_if ' + g.icon + '"></i>' +
+                    '<h2>' + g.name + '</h2>' +
+                    '<span>' + g.note + '（' + wyh_items.length + ' 个演示）</span>' +
+                    '</div>';
+
+                var wyh_grid = document.createElement('div');
+                wyh_grid.className = 'wyh_grid';
+
+                wyh_items.forEach(function (m) {
+                    var wyh_card = document.createElement('article');
+                    wyh_card.className = 'wyh_card';
+                    wyh_card.innerHTML =
+                        '<div class="wyh_card_head">' +
+                        '<h3 class="wyh_m_name">' + m.name + '</h3>' +
+                        '<span class="wyh_tag' + (m.tag.indexOf('改') === -1 ? ' wyh_tag_new' : '') + '">' + m.tag + '</span>' +
+                        '</div>' +
+                        '<p class="wyh_m_desc">' + m.desc + '</p>' +
+                        '<pre class="wyh_m_code">' + m.code + '</pre>' +
+                        '<div class="wyh_viz"></div>' +
+                        '<pre class="wyh_m_result wyh_idle">点击「▶ 运行」查看结果</pre>' +
+                        '<div class="wyh_btns">' +
+                        '<button type="button" class="wyh_btn wyh_btn_run">▶ 运行</button>' +
+                        '<button type="button" class="wyh_btn wyh_btn_reset">↺ 重置</button>' +
+                        '</div>';
+
+                    var wyh_vizBox = wyh_card.querySelector('.wyh_viz');
+                    var wyh_resBox = wyh_card.querySelector('.wyh_m_result');
+
+                    /* 初始状态：展示各演示的基础数据 */
+                    var wyh_init = m.init || (m.cat === 'obj' ? wyh_kv(wyh_obj) : wyh_ch(wyh_str));
+                    wyh_renderViz(wyh_vizBox, wyh_init);
+
+                    wyh_card.querySelector('.wyh_btn_run').addEventListener('click', function () {
+                        var wyh_out = m.run();
+                        wyh_renderViz(wyh_vizBox, wyh_out.viz);
+                        wyh_resBox.classList.remove('wyh_idle');
+                        wyh_resBox.textContent = wyh_out.result;
+                    });
+
+                    wyh_card.querySelector('.wyh_btn_reset').addEventListener('click', function () {
+                        wyh_renderViz(wyh_vizBox, wyh_init);
+                        wyh_resBox.classList.add('wyh_idle');
+                        wyh_resBox.textContent = '点击「▶ 运行」查看结果';
+                    });
+
+                    wyh_grid.appendChild(wyh_card);
+                });
+
+                wyh_sec.appendChild(wyh_grid);
+                wyh_app.appendChild(wyh_sec);
+            });
+        })();
+    </script>
+</body>
+</html>

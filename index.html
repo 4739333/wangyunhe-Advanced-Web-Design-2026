@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-10-29 功能：GitHub Pages 站点入口跳转页 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="2;url=./课堂作业/index.html">
+    <title>王云鹤《高级网页设计》· 站点入口</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            color: #e8ebf7;
+        }
+
+        .wyh_box {
+            text-align: center;
+            padding: 46px 56px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .wyh_title {
+            font-size: 28px;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #7ab8ff, #b48cff, #63e6be);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 14px;
+        }
+
+        .wyh_tip { color: #93a0c8; font-size: 14px; margin-bottom: 24px; }
+
+        .wyh_link {
+            display: inline-block;
+            padding: 11px 32px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #2f6df6, #7ab8ff);
+            color: #fff;
+            font-size: 15px;
+            text-decoration: none;
+            transition: transform .2s ease, filter .2s ease;
+        }
+
+        .wyh_link:hover { transform: translateY(-2px); filter: brightness(1.12); }
+        .wyh_link:active { transform: scale(.94); }
+    </style>
+</head>
+<body>
+    <main class="wyh_box">
+        <h1 class="wyh_title">高级网页设计 · 课堂实践</h1>
+        <p class="wyh_tip">2 秒后自动跳转到作品索引页……</p>
+        <a class="wyh_link" href="./课堂作业/index.html">进入作品索引</a>
+    </main>
+</body>
+</html>

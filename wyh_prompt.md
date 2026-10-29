@@ -81,3 +81,15 @@ D:\Advanced Web Design\四级项目\图像解决方案\高级网页设计I 实�
 ## 2026-10-26-18-08
 - 模型：Qwen3.8-Flash
 - 提示词：创建技能skill，提交到GitHub，将本项目commit并push到 https://github.com/4739333/wangyunhe-Advanced-Web-Design-2026 ，已设置公钥
+
+## 2026-10-29-10-00
+- 模型：Qwen3.8-Flash
+- 提示词：编写16-1.html，形象的展示Javascript主要的数组方法
+
+## 2026-10-29-15-48
+- 模型：Qwen3.8-Flash
+- 提示词：生成16-2.html，形象的展示Javascript对象和字符串
+
+## 2026-10-29-16-05
+- 模型：Qwen3.8-Flash
+- 提示词：https://4739333.github.io/wangyunhe-Advanced-Web-Design-2026/ 我打开为啥是404

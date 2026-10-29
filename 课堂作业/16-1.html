@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-10-29 功能：JavaScript 主要数组方法可视化演示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 主要数组方法演示</title>
+    <link rel="stylesheet" href="../font/wyh_iconfont.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            color: #e8ebf7;
+            padding: 48px 20px 70px;
+            line-height: 1.7;
+        }
+
+        .wyh_container {
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+
+        /* ---------- 标题区 ---------- */
+        .wyh_title {
+            text-align: center;
+            font-size: 34px;
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, #7ab8ff, #b48cff, #63e6be);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .wyh_subtitle {
+            text-align: center;
+            color: #93a0c8;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 26px;
+        }
+
+        /* ---------- 图例 ---------- */
+        .wyh_legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 18px;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 14px;
+            margin-bottom: 40px;
+            font-size: 13px;
+            color: #b9c3e2;
+        }
+
+        .wyh_legend_item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wyh_dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .wyh_dot_keep { background: #3b4a6b; }
+        .wyh_dot_add  { background: #2fbf71; }
+        .wyh_dot_del  { background: #e5484d; opacity: .55; }
+        .wyh_dot_hit  { background: #f5b83d; }
+        .wyh_dot_move { background: #7ab8ff; }
+
+        /* ---------- 分组标题 ---------- */
+        .wyh_section {
+            margin-bottom: 44px;
+        }
+
+        .wyh_section_head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed rgba(255, 255, 255, .15);
+        }
+
+        .wyh_section_head i {
+            font-size: 24px;
+            color: var(--wyh_sec, #7ab8ff);
+        }
+
+        .wyh_section_head h2 {
+            font-size: 22px;
+            letter-spacing: 2px;
+            color: var(--wyh_sec, #7ab8ff);
+        }
+
+        .wyh_section_head span {
+            color: #93a0c8;
+            font-size: 13px;
+            margin-left: auto;
+        }
+
+        .wyh_sec_mut  { --wyh_sec: #7ab8ff; }
+        .wyh_sec_find { --wyh_sec: #f5b83d; }
+        .wyh_sec_conv { --wyh_sec: #b48cff; }
+        .wyh_sec_iter { --wyh_sec: #63e6be; }
+
+        /* ---------- 方法卡片 ---------- */
+        .wyh_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 20px;
+        }
+
+        .wyh_card {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 16px;
+            padding: 20px 22px;
+            position: relative;
+            overflow: hidden;
+            transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+        }
+
+        .wyh_card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--wyh_sec, #7ab8ff);
+        }
+
+        .wyh_card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, .25);
+            box-shadow: 0 14px 34px rgba(0, 0, 0, .4);
+        }
+
+        .wyh_card_head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .wyh_m_name {
+            font-size: 19px;
+            font-family: Consolas, "Courier New", monospace;
+            color: var(--wyh_sec, #7ab8ff);
+            letter-spacing: .5px;
+        }
+
+        .wyh_tag {
+            font-size: 11.5px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--wyh_sec, #7ab8ff);
+            color: var(--wyh_sec, #7ab8ff);
+            white-space: nowrap;
+        }
+
+        .wyh_tag_new {
+            border-color: #2fbf71;
+            color: #2fbf71;
+        }
+
+        .wyh_m_desc {
+            font-size: 13.5px;
+            color: #b9c3e2;
+            margin-bottom: 12px;
+        }
+
+        .wyh_m_code {
+            background: rgba(0, 0, 0, .35);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            color: #c9e3ff;
+            margin-bottom: 14px;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* ---------- 数组可视化 ---------- */
+        .wyh_chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 52px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+
+        .wyh_chip {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            animation: wyh_pop .35s ease backwards;
+        }
+
+        .wyh_chip em {
+            font-style: normal;
+            font-size: 10px;
+            color: #7d8bb0;
+            font-family: Consolas, monospace;
+        }
+
+        .wyh_chip b {
+            min-width: 40px;
+            height: 32px;
+            padding: 0 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: Consolas, monospace;
+            background: #3b4a6b;
+            color: #e8ebf7;
+            border: 1px solid rgba(255, 255, 255, .12);
+            transition: all .3s ease;
+        }
+
+        .wyh_chip_add b {
+            background: rgba(47, 191, 113, .25);
+            border-color: #2fbf71;
+            color: #7ff0b2;
+        }
+
+        .wyh_chip_del b {
+            background: rgba(229, 72, 77, .18);
+            border-color: #e5484d;
+            color: #ff9b9e;
+            text-decoration: line-through;
+            opacity: .6;
+        }
+
+        .wyh_chip_hit b {
+            background: rgba(245, 184, 61, .25);
+            border-color: #f5b83d;
+            color: #ffd98a;
+            box-shadow: 0 0 12px rgba(245, 184, 61, .35);
+        }
+
+        .wyh_chip_move b {
+            background: rgba(122, 184, 255, .25);
+            border-color: #7ab8ff;
+            color: #bfe0ff;
+        }
+
+        .wyh_chip_dim b {
+            opacity: .28;
+        }
+
+        @keyframes wyh_pop {
+            from { transform: scale(.4) translateY(10px); opacity: 0; }
+            to   { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        /* ---------- 结果区 ---------- */
+        .wyh_m_result {
+            background: rgba(0, 0, 0, .25);
+            border-left: 3px solid var(--wyh_sec, #7ab8ff);
+            border-radius: 0 10px 10px 0;
+            padding: 9px 13px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12.5px;
+            color: #d5e2ff;
+            white-space: pre-wrap;
+            word-break: break-all;
+            min-height: 40px;
+            margin-bottom: 14px;
+        }
+
+        .wyh_m_result.wyh_idle {
+            color: #6b7899;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        /* ---------- 按钮 ---------- */
+        .wyh_btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .wyh_btn {
+            flex: 1;
+            padding: 8px 0;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            color: #fff;
+            transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
+        }
+
+        .wyh_btn:active {
+            transform: scale(.9);
+        }
+
+        .wyh_btn:hover {
+            filter: brightness(1.15);
+        }
+
+        .wyh_btn_run {
+            background: linear-gradient(135deg, var(--wyh_sec, #7ab8ff), #2f6df6);
+            box-shadow: 0 8px 18px -10px var(--wyh_sec, #7ab8ff);
+        }
+
+        .wyh_btn_reset {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .15);
+            color: #b9c3e2;
+        }
+
+        .wyh_btn_reset:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, .35);
+        }
+
+        /* ---------- 页脚 ---------- */
+        .wyh_foot {
+            text-align: center;
+            color: #6b7899;
+            font-size: 13px;
+            margin-top: 30px;
+            padding-top: 22px;
+            border-top: 1px dashed rgba(255, 255, 255, .12);
+        }
+
+        @media (max-width: 640px) {
+            .wyh_title { font-size: 26px; }
+            .wyh_section_head span { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .wyh_chip { animation: none; }
+            .wyh_card, .wyh_btn { transition: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wyh_container">
+        <h1 class="wyh_title">JavaScript 主要数组方法</h1>
+        <p class="wyh_subtitle">每个方法都以彩色盒子演示数组的变化 —— 点击「▶ 运行」查看动画效果</p>
+
+        <div class="wyh_legend">
+            <span class="wyh_legend_item"><span class="wyh_dot wyh_dot_keep"></span>原元素</span>
+            <span class="wyh_legend_item"><span class="wyh_dot wyh_dot_add"></span>新增元素</span>
+            <span class="wyh_legend_item"><span class="wyh_dot wyh_dot_del"></span>被删除</span>
+            <span class="wyh_legend_item"><span class="wyh_dot wyh_dot_hit"></span>命中 / 选中</span>
+            <span class="wyh_legend_item"><span class="wyh_dot wyh_dot_move"></span>位置变化</span>
+        </div>
+
+        <!-- 四个分组由 JS 动态生成 -->
+        <div id="wyh_app"></div>
+
+        <footer class="wyh_foot">
+            王云鹤 · 学号 0416 · 计算机24006 · 高级网页设计 16-1 ｜ 原生 HTML / CSS / JavaScript，无 CDN
+        </footer>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            /* ---------- 基础数据与工具 ---------- */
+            var wyh_base = [10, 20, 30, 40, 50];
+
+            function wyh_keep(a) {
+                return a.map(function (v) { return { v: v, s: 'keep' }; });
+            }
+
+            /* 分组定义：mut 增删改 / find 查找 / conv 转换拼接 / iter 遍历计算 */
+            var wyh_groups = [
+                { id: 'mut',  icon: 'wyh_if_grid', name: '增删与原地修改', note: '这些方法会直接改变原数组', cls: 'wyh_sec_mut' },
+                { id: 'find', icon: 'wyh_if_star', name: '查找与判断',     note: '返回下标、元素或布尔值',   cls: 'wyh_sec_find' },
+                { id: 'conv', icon: 'wyh_if_book', name: '转换与拼接',     note: '返回新数组或字符串（fill 除外）', cls: 'wyh_sec_conv' },
+                { id: 'iter', icon: 'wyh_if_bell', name: '遍历与计算',     note: '函数式风格，不改变原数组', cls: 'wyh_sec_iter' }
+            ];
+
+            /* 方法定义：base 可自定义起始数组，run(a) 返回 {chips, result} */
+            var wyh_methods = [
+                /* ===== 增删与原地修改 ===== */
+                { cat: 'mut', name: 'push()', tag: '改原数组',
+                  desc: '在数组末尾追加一个或多个元素，返回新的长度。',
+                  code: 'arr.push(60, 70)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c.push({ v: 60, s: 'add' }, { v: 70, s: 'add' });
+                      return { chips: c, result: '返回值：7（新长度）\narr → [10,20,30,40,50,60,70]' };
+                  } },
+                { cat: 'mut', name: 'pop()', tag: '改原数组',
+                  desc: '删除并返回数组的最后一个元素，数组变短。',
+                  code: 'arr.pop()',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c[c.length - 1].s = 'del';
+                      return { chips: c, result: '返回值：50（被弹出的元素）\narr → [10,20,30,40]' };
+                  } },
+                { cat: 'mut', name: 'unshift()', tag: '改原数组',
+                  desc: '在数组开头插入元素，其余元素下标整体后移。',
+                  code: 'arr.unshift(5)',
+                  run: function (a) {
+                      var c = [{ v: 5, s: 'add' }].concat(wyh_keep(a));
+                      return { chips: c, result: '返回值：6（新长度）\narr → [5,10,20,30,40,50]' };
+                  } },
+                { cat: 'mut', name: 'shift()', tag: '改原数组',
+                  desc: '删除并返回数组的第一个元素，其余元素前移。',
+                  code: 'arr.shift()',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c[0].s = 'del';
+                      return { chips: c, result: '返回值：10（被移走的队头）\narr → [20,30,40,50]' };
+                  } },
+                { cat: 'mut', name: 'splice()', tag: '改原数组',
+                  desc: '万能手术刀：从下标 1 开始删除 2 个元素，再插入 99。',
+                  code: 'arr.splice(1, 2, 99)',
+                  run: function (a) {
+                      return {
+                          chips: [
+                              { v: 10, s: 'keep' }, { v: 20, s: 'del' }, { v: 30, s: 'del' },
+                              { v: 99, s: 'add' }, { v: 40, s: 'keep' }, { v: 50, s: 'keep' }
+                          ],
+                          result: '返回值：[20,30]（被删元素）\narr → [10,99,40,50]'
+                      };
+                  } },
+                { cat: 'mut', name: 'sort()', tag: '改原数组',
+                  desc: '原地排序。默认按字符串比较，数字务必传比较函数。',
+                  code: 'arr.sort((a, b) => a - b)',
+                  base: [40, 10, 50, 20, 30],
+                  run: function (a) {
+                      var sorted = a.slice().sort(function (x, y) { return x - y; });
+                      return {
+                          chips: sorted.map(function (v) { return { v: v, s: 'move' }; }),
+                          result: 'arr → [10,20,30,40,50]\n（不传比较函数时 110 会排在 9 前面）'
+                      };
+                  } },
+                { cat: 'mut', name: 'reverse()', tag: '改原数组',
+                  desc: '原地颠倒数组中元素的顺序。',
+                  code: 'arr.reverse()',
+                  run: function (a) {
+                      var rev = a.slice().reverse();
+                      return {
+                          chips: rev.map(function (v) { return { v: v, s: 'move' }; }),
+                          result: 'arr → [50,40,30,20,10]'
+                      };
+                  } },
+
+                /* ===== 查找与判断 ===== */
+                { cat: 'find', name: 'indexOf()', tag: '不改原数组',
+                  desc: '返回元素首次出现的下标，找不到返回 -1。',
+                  code: 'arr.indexOf(30)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c[2].s = 'hit';
+                      return { chips: c, result: '返回值：2\narr.indexOf(99) → -1（不存在）' };
+                  } },
+                { cat: 'find', name: 'includes()', tag: '不改原数组',
+                  desc: '判断数组是否包含某个值，返回 true / false。',
+                  code: 'arr.includes(40)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c[3].s = 'hit';
+                      return { chips: c, result: '返回值：true\narr.includes(99) → false' };
+                  } },
+                { cat: 'find', name: 'find()', tag: '不改原数组',
+                  desc: '返回第一个满足条件的元素本身。',
+                  code: 'arr.find(x => x > 25)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c[2].s = 'hit';
+                      c[3].s = 'dim';
+                      c[4].s = 'dim';
+                      return { chips: c, result: '返回值：30\n（10、20 不满足，30 是第一个命中者）' };
+                  } },
+                { cat: 'find', name: 'findIndex()', tag: '不改原数组',
+                  desc: '返回第一个满足条件的元素下标。',
+                  code: 'arr.findIndex(x => x > 25)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c[2].s = 'hit';
+                      c[3].s = 'dim';
+                      c[4].s = 'dim';
+                      return { chips: c, result: '返回值：2\n找不到时返回 -1' };
+                  } },
+
+                /* ===== 转换与拼接 ===== */
+                { cat: 'conv', name: 'join()', tag: '返回字符串',
+                  desc: '把元素用分隔符连成字符串，不写参数默认逗号。',
+                  code: "arr.join(' | ')",
+                  run: function (a) {
+                      return {
+                          chips: wyh_keep(a),
+                          result: '返回值："10 | 20 | 30 | 40 | 50"\n原数组保持不变'
+                      };
+                  } },
+                { cat: 'conv', name: 'slice()', tag: '不改原数组',
+                  desc: '截取下标 1 到 4（不含 4）的片段，返回新数组。',
+                  code: 'arr.slice(1, 4)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c[1].s = 'hit'; c[2].s = 'hit'; c[3].s = 'hit';
+                      c[0].s = 'dim'; c[4].s = 'dim';
+                      return { chips: c, result: '返回值：[20,30,40]\n原数组不变（对比 splice 会改原数组）' };
+                  } },
+                { cat: 'conv', name: 'concat()', tag: '不改原数组',
+                  desc: '合并多个数组 / 值，拼成一个新数组。',
+                  code: 'arr.concat([60, 70])',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c.push({ v: 60, s: 'add' }, { v: 70, s: 'add' });
+                      return { chips: c, result: '返回值：[10,20,30,40,50,60,70]\n原数组不变' };
+                  } },
+                { cat: 'conv', name: 'fill()', tag: '改原数组',
+                  desc: '用固定值填充下标 1 到 4（不含 4）的区间。',
+                  code: 'arr.fill(0, 1, 4)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c[1] = { v: 0, s: 'move' };
+                      c[2] = { v: 0, s: 'move' };
+                      c[3] = { v: 0, s: 'move' };
+                      return { chips: c, result: 'arr → [10,0,0,0,50]\n常用于生成初始数组：new Array(5).fill(1)' };
+                  } },
+
+                /* ===== 遍历与计算 ===== */
+                { cat: 'iter', name: 'forEach()', tag: '无返回值',
+                  desc: '对每个元素执行一次回调，适合打印、累加等副作用。',
+                  code: 'arr.forEach(x => console.log(x))',
+                  run: function (a) {
+                      return {
+                          chips: a.map(function (v, i) { return { v: v, s: 'hit', i: i }; }),
+                          result: '依次访问：10 → 20 → 30 → 40 → 50\n回调参数：(元素, 下标, 数组本身)'
+                      };
+                  } },
+                { cat: 'iter', name: 'map()', tag: '不改原数组',
+                  desc: '每个元素做加工后，返回等长的新数组。',
+                  code: 'arr.map(x => x * 2)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c.forEach(function (ch) { ch.s = 'hit'; });
+                      return { chips: c, result: '返回值：[20,40,60,80,100]\n原数组不变（一进一出，长度不变）' };
+                  } },
+                { cat: 'iter', name: 'filter()', tag: '不改原数组',
+                  desc: '只保留满足条件的元素，返回新数组。',
+                  code: 'arr.filter(x => x > 20)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c[0].s = 'dim'; c[1].s = 'dim';
+                      c[2].s = 'hit'; c[3].s = 'hit'; c[4].s = 'hit';
+                      return { chips: c, result: '返回值：[30,40,50]\n暗掉的盒子被淘汰，原数组不变' };
+                  } },
+                { cat: 'iter', name: 'reduce()', tag: '不改原数组',
+                  desc: '把整个数组"折叠"成一个值：求和、求积、分组。',
+                  code: 'arr.reduce((sum, x) => sum + x, 0)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c.forEach(function (ch) { ch.s = 'hit'; });
+                      return { chips: c, result: '10+20 → 30，+30 → 60，+40 → 100，+50 → 150\n返回值：150' };
+                  } },
+                { cat: 'iter', name: 'some()', tag: '返回布尔',
+                  desc: '只要有一个元素满足条件就返回 true（存在量词）。',
+                  code: 'arr.some(x => x > 45)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c[4].s = 'hit';
+                      c[0].s = 'dim'; c[1].s = 'dim'; c[2].s = 'dim'; c[3].s = 'dim';
+                      return { chips: c, result: '返回值：true（50 > 45 命中一个即可）' };
+                  } },
+                { cat: 'iter', name: 'every()', tag: '返回布尔',
+                  desc: '所有元素都满足条件才返回 true（全称量词）。',
+                  code: 'arr.every(x => x > 15)',
+                  run: function (a) {
+                      var c = wyh_keep(a);
+                      c[0].s = 'del';
+                      c[1].s = 'hit'; c[2].s = 'hit'; c[3].s = 'hit'; c[4].s = 'hit';
+                      return { chips: c, result: '返回值：false（10 不满足，一票否决）' };
+                  } }
+            ];
+
+            /* ---------- 渲染 ---------- */
+            var wyh_app = document.getElementById('wyh_app');
+
+            function wyh_renderChips(box, chips) {
+                box.innerHTML = '';
+                chips.forEach(function (ch, i) {
+                    var wyh_w = document.createElement('span');
+                    wyh_w.className = 'wyh_chip wyh_chip_' + ch.s;
+                    wyh_w.style.animationDelay = (i * 0.05) + 's';
+                    wyh_w.innerHTML = '<em>' + i + '</em><b>' + ch.v + '</b>';
+                    box.appendChild(wyh_w);
+                });
+            }
+
+            wyh_groups.forEach(function (g) {
+                var wyh_sec = document.createElement('section');
+                wyh_sec.className = 'wyh_section ' + g.cls;
+
+                var wyh_items = wyh_methods.filter(function (m) { return m.cat === g.id; });
+
+                wyh_sec.innerHTML =
+                    '<div class="wyh_section_head">' +
+                    '<i class="wyh_if ' + g.icon + '"></i>' +
+                    '<h2>' + g.name + '</h2>' +
+                    '<span>' + g.note + '（' + wyh_items.length + ' 个方法）</span>' +
+                    '</div>';
+
+                var wyh_grid = document.createElement('div');
+                wyh_grid.className = 'wyh_grid';
+
+                wyh_items.forEach(function (m) {
+                    var wyh_card = document.createElement('article');
+                    wyh_card.className = 'wyh_card';
+                    wyh_card.innerHTML =
+                        '<div class="wyh_card_head">' +
+                        '<h3 class="wyh_m_name">' + m.name + '</h3>' +
+                        '<span class="wyh_tag' + (m.tag.indexOf('改') === -1 ? ' wyh_tag_new' : '') + '">' + m.tag + '</span>' +
+                        '</div>' +
+                        '<p class="wyh_m_desc">' + m.desc + '</p>' +
+                        '<pre class="wyh_m_code">let arr = [' + (m.base || wyh_base).join(', ') + '];\n' + m.code + '</pre>' +
+                        '<div class="wyh_chips"></div>' +
+                        '<pre class="wyh_m_result wyh_idle">点击「▶ 运行」查看结果</pre>' +
+                        '<div class="wyh_btns">' +
+                        '<button type="button" class="wyh_btn wyh_btn_run">▶ 运行</button>' +
+                        '<button type="button" class="wyh_btn wyh_btn_reset">↺ 重置</button>' +
+                        '</div>';
+
+                    var wyh_chipBox = wyh_card.querySelector('.wyh_chips');
+                    var wyh_resBox = wyh_card.querySelector('.wyh_m_result');
+                    var wyh_start = (m.base || wyh_base).slice();
+
+                    /* 初始状态：灰色原数组 */
+                    wyh_renderChips(wyh_chipBox, wyh_keep(wyh_start));
+
+                    wyh_card.querySelector('.wyh_btn_run').addEventListener('click', function () {
+                        var wyh_out = m.run(wyh_start.slice());
+                        wyh_renderChips(wyh_chipBox, wyh_out.chips);
+                        wyh_resBox.classList.remove('wyh_idle');
+                        wyh_resBox.textContent = wyh_out.result;
+                    });
+
+                    wyh_card.querySelector('.wyh_btn_reset').addEventListener('click', function () {
+                        wyh_renderChips(wyh_chipBox, wyh_keep(wyh_start));
+                        wyh_resBox.classList.add('wyh_idle');
+                        wyh_resBox.textContent = '点击「▶ 运行」查看结果';
+                    });
+
+                    wyh_grid.appendChild(wyh_card);
+                });
+
+                wyh_sec.appendChild(wyh_grid);
+                wyh_app.appendChild(wyh_sec);
+            });
+        })();
+    </script>
+</body>
+</html>
