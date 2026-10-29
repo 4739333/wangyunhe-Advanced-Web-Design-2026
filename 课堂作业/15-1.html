@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-10-26 功能：数7游戏100盒子演示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数7游戏 — 100个盒子</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .wyh_body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            padding: 40px 24px 60px;
+            color: #e8ebf7;
+            min-height: 100vh;
+        }
+
+        .wyh_container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .wyh_back-link {
+            display: inline-block;
+            margin-bottom: 18px;
+            color: #7ab8ff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color .2s ease;
+        }
+
+        .wyh_back-link:hover {
+            color: #bfe0ff;
+            text-decoration: underline;
+        }
+
+        .wyh_container h1 {
+            text-align: center;
+            font-size: 32px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, #7ab8ff, #f5b83d, #63e6be);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .wyh_subtitle {
+            text-align: center;
+            color: #93a0c8;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        .wyh_subtitle b {
+            color: #f5b83d;
+        }
+
+        .wyh_rules {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 14px;
+            padding: 16px 22px;
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+            line-height: 1.9;
+            margin-bottom: 22px;
+        }
+
+        .wyh_rules b {
+            color: #7ab8ff;
+        }
+
+        .wyh_rules ul {
+            margin-left: 22px;
+            color: #b9c3e2;
+        }
+
+        .wyh_legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #b9c3e2;
+        }
+
+        .wyh_legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wyh_dot {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 5px;
+            vertical-align: middle;
+        }
+
+        .wyh_dot_num {
+            background: #3b4a6b;
+            border: 2px solid #7ab8ff;
+        }
+
+        .wyh_dot_pass {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .wyh_grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .wyh_box {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            border: 1.5px solid rgba(122, 184, 255, .45);
+            background: rgba(59, 74, 107, .55);
+            color: #cfe0ff;
+            transition: transform .2s ease, box-shadow .2s ease;
+            animation: wyh_pop .4s ease backwards;
+        }
+
+        .wyh_box:hover {
+            transform: translateY(-3px) scale(1.06);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, .35);
+        }
+
+        .wyh_box_pass {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border-color: #ffd98a;
+            color: #fff;
+            font-size: 17px;
+            box-shadow: 0 0 14px rgba(243, 156, 18, .45);
+        }
+
+        @keyframes wyh_pop {
+            from { transform: scale(.3); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+
+        .wyh_summary {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 15px;
+            color: #b9c3e2;
+            background: rgba(255, 255, 255, .05);
+            border: 1px dashed rgba(255, 255, 255, .18);
+            border-radius: 14px;
+            padding: 14px 20px;
+        }
+
+        .wyh_summary b {
+            color: #f5b83d;
+            font-size: 18px;
+        }
+
+        @media (max-width: 640px) {
+            .wyh_grid { grid-template-columns: repeat(5, 1fr); }
+            .wyh_container h1 { font-size: 24px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .wyh_box { animation: none; transition: none; }
+        }
+    </style>
+</head>
+<body class="wyh_body">
+    <div class="wyh_container">
+        <a href="index.html" class="wyh_back-link">← 返回首页</a>
+        <h1>数7游戏（100个盒子）</h1>
+        <p class="wyh_subtitle">作者：<b>王云鹤</b> —— 满足规则的盒子输出"过"，不满足的输出数字</p>
+
+        <div class="wyh_rules">
+            <b>数7规则</b>（1 ~ 100）：
+            <ul>
+                <li>7 的倍数：7、14、21……98</li>
+                <li>末尾是 7 的数：7、17、27……97</li>
+                <li>十位是 7 的数：70 ~ 79</li>
+            </ul>
+        </div>
+
+        <div class="wyh_legend">
+            <span><i class="wyh_dot wyh_dot_num"></i>普通数字（可数）</span>
+            <span><i class="wyh_dot wyh_dot_pass"></i>过（跳过）</span>
+        </div>
+
+        <div class="wyh_grid" id="wyh_grid"></div>
+
+        <p class="wyh_summary" id="wyh_summary"></p>
+    </div>
+
+    <script>
+        // 判断数字 n 是否满足数7规则：7的倍数 或 数字中含有7（个位是7、十位是7）
+        function wyh_isPass(wyh_n) {
+            return wyh_n % 7 === 0 || String(wyh_n).indexOf('7') !== -1;
+        }
+
+        // 生成100个盒子
+        var wyh_grid = document.getElementById('wyh_grid');
+        var wyh_html = '';
+        var wyh_passCount = 0;
+        for (var wyh_i = 1; wyh_i <= 100; wyh_i++) {
+            if (wyh_isPass(wyh_i)) {
+                // 满足规则：输出"过"盒子
+                wyh_passCount++;
+                wyh_html += '<div class="wyh_box wyh_box_pass" style="animation-delay:' + wyh_i * 0.015 + 's">过</div>';
+            } else {
+                // 不满足规则：输出盒子内部是数字
+                wyh_html += '<div class="wyh_box" style="animation-delay:' + wyh_i * 0.015 + 's">' + wyh_i + '</div>';
+            }
+        }
+        wyh_grid.innerHTML = wyh_html;
+
+        // 统计结果
+        document.getElementById('wyh_summary').innerHTML =
+            '王云鹤的数7统计：1~100 中共需要喊 <b>过</b> 的盒子有 <b>' + wyh_passCount + '</b> 个（绿色/橙色盒子），正常报数的有 ' + (100 - wyh_passCount) + ' 个。';
+    </script>
+</body>
+</html>

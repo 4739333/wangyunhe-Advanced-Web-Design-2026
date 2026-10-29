@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-10-26 功能：JavaScript程序结构演示（条件与循环） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 程序结构：条件与循环</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .wyh_body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            padding: 40px 24px 60px;
+            color: #e8ebf7;
+            min-height: 100vh;
+        }
+
+        .wyh_container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .wyh_back-link {
+            display: inline-block;
+            margin-bottom: 18px;
+            color: #7ab8ff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color .2s ease;
+        }
+
+        .wyh_back-link:hover {
+            color: #bfe0ff;
+            text-decoration: underline;
+        }
+
+        .wyh_container h1 {
+            text-align: center;
+            font-size: 32px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, #7ab8ff, #b48cff, #63e6be);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .wyh_subtitle {
+            text-align: center;
+            color: #93a0c8;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .wyh_subtitle b {
+            color: #7ab8ff;
+        }
+
+        .wyh_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+            gap: 22px;
+        }
+
+        .wyh_card {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 16px;
+            padding: 22px 26px;
+            backdrop-filter: blur(10px);
+            border-top: 4px solid #7ab8ff;
+            transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+        }
+
+        .wyh_card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 34px rgba(0, 0, 0, .4);
+            border-color: rgba(255, 255, 255, .25);
+            border-top-color: #7ab8ff;
+        }
+
+        .wyh_card_loop {
+            border-top-color: #2ecc71;
+        }
+
+        .wyh_card_loop:hover {
+            border-top-color: #2ecc71;
+        }
+
+        .wyh_card h2 {
+            font-size: 20px;
+            color: #7ab8ff;
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+        }
+
+        .wyh_card_loop h2 {
+            color: #6ee7a8;
+        }
+
+        .wyh_card h3 {
+            font-size: 15px;
+            color: #cfe0ff;
+            margin: 18px 0 8px;
+        }
+
+        .wyh_code {
+            background: rgba(0, 0, 0, .38);
+            border: 1px solid rgba(255, 255, 255, .08);
+            color: #c9e3ff;
+            padding: 11px 13px;
+            border-radius: 10px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .wyh_row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .wyh_input {
+            width: 90px;
+            padding: 8px 10px;
+            border: 1.5px solid rgba(255, 255, 255, .18);
+            background: rgba(0, 0, 0, .3);
+            color: #e8ebf7;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .wyh_input:focus {
+            border-color: #7ab8ff;
+            box-shadow: 0 0 0 3px rgba(122, 184, 255, .2);
+        }
+
+        .wyh_select {
+            padding: 8px 10px;
+            border: 1.5px solid rgba(255, 255, 255, .18);
+            background: #1c2340;
+            color: #e8ebf7;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .wyh_btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #2f6df6, #7ab8ff);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 8px 18px -10px #2f6df6;
+            transition: transform .15s ease, filter .2s ease;
+        }
+
+        .wyh_card_loop .wyh_btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            box-shadow: 0 8px 18px -10px #2ecc71;
+        }
+
+        .wyh_btn:hover {
+            filter: brightness(1.15);
+        }
+
+        .wyh_btn:active {
+            transform: scale(.9);
+        }
+
+        .wyh_result {
+            background: rgba(0, 0, 0, .25);
+            border: 1px dashed rgba(255, 255, 255, .22);
+            border-radius: 10px;
+            padding: 10px 13px;
+            font-size: 14px;
+            min-height: 42px;
+            line-height: 1.8;
+            color: #b9c3e2;
+            word-break: break-all;
+        }
+
+        .wyh_result b {
+            color: #ffd98a;
+        }
+
+        .wyh_note {
+            margin-top: 28px;
+            background: rgba(245, 184, 61, .08);
+            border: 1px solid rgba(245, 184, 61, .35);
+            border-radius: 14px;
+            padding: 16px 22px;
+            font-size: 14px;
+            color: #e6d3a3;
+            line-height: 1.9;
+        }
+
+        .wyh_note b {
+            color: #f5b83d;
+        }
+
+        @media (max-width: 640px) {
+            .wyh_container h1 { font-size: 24px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .wyh_card, .wyh_btn { transition: none; }
+        }
+    </style>
+</head>
+<body class="wyh_body">
+    <div class="wyh_container">
+        <a href="index.html" class="wyh_back-link">← 返回首页</a>
+        <h1>JavaScript 程序结构：条件与循环</h1>
+        <p class="wyh_subtitle">作者：<b>王云鹤</b> —— 演示 if...else / switch 条件结构与 for / while / do...while 循环结构</p>
+
+        <div class="wyh_grid">
+            <!-- 条件结构 -->
+            <div class="wyh_card">
+                <h2>一、条件结构</h2>
+
+                <h3>1. if...else（判断分数等级）</h3>
+                <div class="wyh_code">if (wyh_score >= 90) { ... } 
+else if (wyh_score >= 60) { ... } 
+else { ... }</div>
+                <div class="wyh_row">
+                    <input type="number" class="wyh_input" id="wyh_scoreInput" value="85" min="0" max="100">
+                    <button class="wyh_btn" onclick="wyh_checkGrade()">判断等级</button>
+                </div>
+                <div class="wyh_result" id="wyh_gradeResult"></div>
+
+                <h3>2. switch（数字转星期）</h3>
+                <div class="wyh_code">switch (wyh_day) {
+    case 1: wyh_name = "星期一"; break;
+    ...
+    default: wyh_name = "输入有误";
+}</div>
+                <div class="wyh_row">
+                    <select class="wyh_select" id="wyh_daySelect">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8（测试default）</option>
+                    </select>
+                    <button class="wyh_btn" onclick="wyh_checkDay()">switch转换</button>
+                </div>
+                <div class="wyh_result" id="wyh_dayResult"></div>
+            </div>
+
+            <!-- 循环结构 -->
+            <div class="wyh_card wyh_card_loop">
+                <h2>二、循环结构</h2>
+
+                <h3>1. for 循环（1 ~ n 累加求和）</h3>
+                <div class="wyh_code">var wyh_sum = 0;
+for (var wyh_i = 1; wyh_i <= wyh_n; wyh_i++) {
+    wyh_sum += wyh_i;
+}</div>
+                <div class="wyh_row">
+                    <input type="number" class="wyh_input" id="wyh_forInput" value="100" min="1" max="10000">
+                    <button class="wyh_btn" onclick="wyh_runFor()">for循环求和</button>
+                </div>
+                <div class="wyh_result" id="wyh_forResult"></div>
+
+                <h3>2. while 循环（1 ~ n 阶乘）</h3>
+                <div class="wyh_code">var wyh_fact = 1, wyh_j = 1;
+while (wyh_j <= wyh_n) {
+    wyh_fact *= wyh_j;
+    wyh_j++;
+}</div>
+                <div class="wyh_row">
+                    <input type="number" class="wyh_input" id="wyh_whileInput" value="5" min="1" max="170">
+                    <button class="wyh_btn" onclick="wyh_runWhile()">while循环求阶乘</button>
+                </div>
+                <div class="wyh_result" id="wyh_whileResult"></div>
+
+                <h3>3. do...while 循环（先执行后判断，输出偶数）</h3>
+                <div class="wyh_code">var wyh_k = 2;
+do {
+    wyh_out += wyh_k + " ";
+    wyh_k += 2;
+} while (wyh_k <= 20);</div>
+                <div class="wyh_row">
+                    <button class="wyh_btn" onclick="wyh_runDoWhile()">do...while输出2~20偶数</button>
+                </div>
+                <div class="wyh_result" id="wyh_doWhileResult"></div>
+            </div>
+        </div>
+
+        <div class="wyh_note">
+            <b>知识点小结：</b>程序结构分为<b>顺序结构</b>、<b>条件结构（分支）</b>和<b>循环结构</b>三种。
+            条件结构按条件选择执行路径（if...else、switch）；循环结构重复执行代码块（for、while、do...while），
+            可用 <b>break</b> 跳出循环、<b>continue</b> 跳过本次循环。注意 do...while 至少执行一次循环体。
+        </div>
+    </div>
+
+    <script>
+        // ========== 条件结构：if...else 判断分数等级 ==========
+        function wyh_checkGrade() {
+            var wyh_score = Number(document.getElementById('wyh_scoreInput').value);
+            var wyh_grade;
+            if (wyh_score >= 90) {
+                wyh_grade = '优秀';
+            } else if (wyh_score >= 80) {
+                wyh_grade = '良好';
+            } else if (wyh_score >= 60) {
+                wyh_grade = '及格';
+            } else {
+                wyh_grade = '不及格';
+            }
+            console.log('if...else 判断：' + wyh_score + '分 → ' + wyh_grade);
+            document.getElementById('wyh_gradeResult').innerHTML =
+                'if...else 判断结果：<b>' + wyh_score + ' 分属于【' + wyh_grade + '】</b>';
+        }
+
+        // ========== 条件结构：switch 数字转星期 ==========
+        function wyh_checkDay() {
+            var wyh_day = Number(document.getElementById('wyh_daySelect').value);
+            var wyh_dayName;
+            switch (wyh_day) {
+                case 1: wyh_dayName = '星期一'; break;
+                case 2: wyh_dayName = '星期二'; break;
+                case 3: wyh_dayName = '星期三'; break;
+                case 4: wyh_dayName = '星期四'; break;
+                case 5: wyh_dayName = '星期五'; break;
+                case 6: wyh_dayName = '星期六'; break;
+                case 7: wyh_dayName = '星期日'; break;
+                default: wyh_dayName = '输入有误（1~7之外）';
+            }
+            console.log('switch 判断：' + wyh_day + ' → ' + wyh_dayName);
+            document.getElementById('wyh_dayResult').innerHTML =
+                'switch 判断结果：<b>' + wyh_day + ' → ' + wyh_dayName + '</b>';
+        }
+
+        // ========== 循环结构：for 累加求和 ==========
+        function wyh_runFor() {
+            var wyh_n = Number(document.getElementById('wyh_forInput').value);
+            var wyh_sum = 0;
+            for (var wyh_i = 1; wyh_i <= wyh_n; wyh_i++) {
+                wyh_sum += wyh_i;
+            }
+            console.log('for 循环：1+2+...+' + wyh_n + ' = ' + wyh_sum);
+            document.getElementById('wyh_forResult').innerHTML =
+                'for 循环结果：<b>1+2+...+' + wyh_n + ' = ' + wyh_sum + '</b>（高斯算法验算：' + (wyh_n * (wyh_n + 1) / 2) + '）';
+        }
+
+        // ========== 循环结构：while 阶乘 ==========
+        function wyh_runWhile() {
+            var wyh_n = Number(document.getElementById('wyh_whileInput').value);
+            var wyh_fact = 1;
+            var wyh_j = 1;
+            while (wyh_j <= wyh_n) {
+                wyh_fact *= wyh_j;
+                wyh_j++;
+            }
+            console.log('while 循环：' + wyh_n + '! = ' + wyh_fact);
+            document.getElementById('wyh_whileResult').innerHTML =
+                'while 循环结果：<b>' + wyh_n + '! = ' + wyh_fact + '</b>';
+        }
+
+        // ========== 循环结构：do...while 输出偶数 ==========
+        function wyh_runDoWhile() {
+            var wyh_k = 2;
+            var wyh_out = '';
+            do {
+                wyh_out += wyh_k + ' ';
+                wyh_k += 2;
+            } while (wyh_k <= 20);
+            console.log('do...while 循环输出：' + wyh_out);
+            document.getElementById('wyh_doWhileResult').innerHTML =
+                'do...while 循环结果：<b>' + wyh_out.trim().split(' ').join('、') + '</b>';
+        }
+
+        // 页面加载后先执行一遍默认演示
+        wyh_checkGrade();
+        wyh_checkDay();
+        wyh_runFor();
+        wyh_runWhile();
+        wyh_runDoWhile();
+    </script>
+</body>
+</html>
