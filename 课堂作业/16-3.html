@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-10-29 功能：电商分类导航面板复刻 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分类 — 商品分类导航</title>
+    <link rel="stylesheet" href="../font/wyh_iconfont.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        .wyh_body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(160deg, #e9edf2 0%, #f4f6f9 60%, #e6ebf1 100%);
+            padding: 40px 16px;
+        }
+
+        /* ---------- 分类面板 ---------- */
+        .wyh_panel {
+            width: 400px;
+            max-width: 100%;
+            background: #f7f7f7;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(30, 40, 60, .12);
+            padding: 22px 26px 26px;
+        }
+
+        .wyh_panel_title {
+            font-size: 21px;
+            font-weight: bold;
+            color: #1f1f1f;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+
+        /* ---------- 行通用 ---------- */
+        .wyh_row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 9px 10px;
+            margin: 0 -10px;
+            border-radius: 8px;
+            font-size: 15.5px;
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background .2s ease, color .2s ease;
+        }
+
+        .wyh_row:hover {
+            background: #fff;
+            color: #ff5000;
+        }
+
+        .wyh_row:hover .wyh_sep { color: #ffb48c; }
+        .wyh_row:hover .wyh_sub { color: #ff5000; }
+        .wyh_row:hover .wyh_ic { color: #ff5000; }
+        .wyh_row:hover .wyh_ic_svg { background-color: #ff5000; }
+
+        .wyh_sep {
+            color: #c9c9c9;
+            padding: 0 7px;
+            font-weight: 300;
+        }
+
+        .wyh_sub { color: #333; }
+
+        /* ---------- 促销行 ---------- */
+        .wyh_row_promo {
+            color: #ff5000;
+            font-weight: bold;
+        }
+
+        .wyh_row_promo .wyh_sep { color: #ffb48c; }
+
+        /* ---------- 图标 ---------- */
+        .wyh_ic {
+            font-size: 21px;
+            line-height: 1;
+            color: #333;
+            width: 24px;
+            text-align: center;
+            flex: none;
+            transition: color .2s ease;
+        }
+
+        /* font 目录 SVG 图标用遮罩着色，与 iconfont 保持同色 */
+        .wyh_ic_svg {
+            display: inline-block;
+            width: 21px;
+            height: 21px;
+            background-color: #333;
+            -webkit-mask: var(--wyh-img) no-repeat center / contain;
+            mask: var(--wyh-img) no-repeat center / contain;
+            flex: none;
+            transition: background-color .2s ease;
+        }
+
+        .wyh_ic_phone   { --wyh-img: url("../font/wyh_icon_phone.svg"); }
+        .wyh_ic_setting { --wyh-img: url("../font/wyh_icon_setting.svg"); }
+        .wyh_ic_loc     { --wyh-img: url("../font/wyh_icon_location.svg"); }
+        .wyh_ic_search  { --wyh-img: url("../font/wyh_icon_search.svg"); }
+        .wyh_ic_book2   { --wyh-img: url("../font/wyh_icon_book.svg"); }
+
+        /* ---------- 选中状态 ---------- */
+        .wyh_row_active { background: #fff; box-shadow: inset 3px 0 0 #ff5000; }
+        .wyh_row_active .wyh_ic { color: #ff5000; }
+        .wyh_row_active .wyh_ic_svg { background-color: #ff5000; }
+
+        /* ---------- 底部说明 ---------- */
+        .wyh_foot {
+            width: 400px;
+            max-width: 100%;
+            text-align: center;
+            color: #8a93a3;
+            font-size: 12.5px;
+            margin-top: 26px;
+        }
+
+        .wyh_wrap { display: flex; flex-direction: column; align-items: center; }
+
+        @media (max-width: 460px) {
+            .wyh_panel { padding: 18px 16px 20px; }
+            .wyh_row { font-size: 14px; gap: 10px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .wyh_row, .wyh_ic, .wyh_ic_svg { transition: none; }
+        }
+    </style>
+</head>
+<body class="wyh_body">
+    <div class="wyh_wrap">
+        <nav class="wyh_panel" aria-label="商品分类">
+            <h2 class="wyh_panel_title">分类</h2>
+
+            <a class="wyh_row wyh_row_promo" href="javascript:void(0)">
+                <i class="wyh_if wyh_if_star wyh_ic"></i>
+                <span>叠券低至7.2折起<span class="wyh_sep">/</span>爆款8.5折起</span>
+            </a>
+
+            <a class="wyh_row" href="javascript:void(0)">
+                <i class="wyh_if wyh_if_grid wyh_ic"></i>
+                <span>电脑<span class="wyh_sep">/</span><span class="wyh_sub">配件</span><span class="wyh_sep">/</span><span class="wyh_sub">办公</span><span class="wyh_sep">/</span><span class="wyh_sub">文具</span></span>
+            </a>
+
+            <a class="wyh_row" href="javascript:void(0)">
+                <span class="wyh_ic_svg wyh_ic_phone"></span>
+                <span>家电<span class="wyh_sep">/</span><span class="wyh_sub">手机</span><span class="wyh_sep">/</span><span class="wyh_sub">通信</span><span class="wyh_sep">/</span><span class="wyh_sub">数码</span></span>
+            </a>
+
+            <a class="wyh_row" href="javascript:void(0)">
+                <span class="wyh_ic_svg wyh_ic_setting"></span>
+                <span>工业品<span class="wyh_sep">/</span><span class="wyh_sub">商业</span><span class="wyh_sep">/</span><span class="wyh_sub">农业</span><span class="wyh_sep">/</span><span class="wyh_sub">定制</span></span>
+            </a>
+
+            <a class="wyh_row" href="javascript:void(0)">
+                <i class="wyh_if wyh_if_home wyh_ic"></i>
+                <span>家具<span class="wyh_sep">/</span><span class="wyh_sub">家装</span><span class="wyh_sep">/</span><span class="wyh_sub">家居</span><span class="wyh_sep">/</span><span class="wyh_sub">厨具</span></span>
+            </a>
+
+            <a class="wyh_row" href="javascript:void(0)">
+                <i class="wyh_if wyh_if_user wyh_ic"></i>
+                <span>女装<span class="wyh_sep">/</span><span class="wyh_sub">男装</span><span class="wyh_sep">/</span><span class="wyh_sub">内衣</span><span class="wyh_sep">/</span><span class="wyh_sub">配饰</span></span>
+            </a>
+
+            <a class="wyh_row" href="javascript:void(0)">
+                <span class="wyh_ic_svg wyh_ic_loc"></span>
+                <span>女鞋<span class="wyh_sep">/</span><span class="wyh_sub">男鞋</span><span class="wyh_sep">/</span><span class="wyh_sub">运动</span><span class="wyh_sep">/</span><span class="wyh_sub">户外</span></span>
+            </a>
+
+            <a class="wyh_row" href="javascript:void(0)">
+                <span class="wyh_ic_svg wyh_ic_search"></span>
+                <span>汽车<span class="wyh_sep">/</span><span class="wyh_sub">珠宝</span><span class="wyh_sep">/</span><span class="wyh_sub">文玩</span><span class="wyh_sep">/</span><span class="wyh_sub">箱包</span></span>
+            </a>
+
+            <a class="wyh_row" href="javascript:void(0)">
+                <i class="wyh_if wyh_if_bell wyh_ic"></i>
+                <span>食品<span class="wyh_sep">/</span><span class="wyh_sub">鲜花</span><span class="wyh_sep">/</span><span class="wyh_sub">酒水</span><span class="wyh_sep">/</span><span class="wyh_sub">健康</span></span>
+            </a>
+
+            <a class="wyh_row" href="javascript:void(0)">
+                <span class="wyh_ic_svg wyh_ic_book2"></span>
+                <span>母婴<span class="wyh_sep">/</span><span class="wyh_sub">童装</span><span class="wyh_sep">/</span><span class="wyh_sub">玩具</span><span class="wyh_sep">/</span><span class="wyh_sub">宠物</span></span>
+            </a>
+        </nav>
+
+        <p class="wyh_foot">王云鹤 · 学号 0416 · 计算机24006 · 高级网页设计 16-3 ｜ 图标取自 font 目录（iconfont + SVG）</p>
+    </div>
+
+    <script>
+        // 点击分类行时短暂高亮，模拟选中反馈
+        (function () {
+            'use strict';
+            var wyh_rows = document.querySelectorAll('.wyh_row');
+            for (var wyh_i = 0; wyh_i < wyh_rows.length; wyh_i++) {
+                (function (wyh_row) {
+                    wyh_row.addEventListener('click', function () {
+                        var wyh_cur = document.querySelector('.wyh_row_active');
+                        if (wyh_cur && wyh_cur !== wyh_row) wyh_cur.classList.remove('wyh_row_active');
+                        wyh_row.classList.toggle('wyh_row_active');
+                    });
+                })(wyh_rows[wyh_i]);
+            }
+        })();
+    </script>
+</body>
+</html>
