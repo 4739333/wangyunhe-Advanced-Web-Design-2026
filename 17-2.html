@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-02 功能：fetch 获取一言接口数据并展示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fetch 获取接口数据</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            color: #e8ebf7;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            padding: 48px 20px 70px;
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        .wyh_container { max-width: 860px; margin: 0 auto; }
+
+        /* ---------- 标题区 ---------- */
+        .wyh_title {
+            text-align: center;
+            font-size: 32px;
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, #7ab8ff, #b48cff, #63e6be);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .wyh_subtitle {
+            text-align: center;
+            color: #93a0c8;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 26px;
+        }
+
+        /* ---------- 返回链接 ---------- */
+        .wyh_back-link {
+            display: inline-block;
+            margin-bottom: 16px;
+            color: #93a0c8;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .wyh_back-link:hover { color: #7ab8ff; }
+
+        /* ---------- 卡片 ---------- */
+        .wyh_card {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 18px;
+            backdrop-filter: blur(6px);
+        }
+
+        .wyh_card h2 { font-size: 17px; color: #e8ebf7; margin-bottom: 12px; }
+
+        /* ---------- 数据来源徽章 ---------- */
+        .wyh_badge {
+            display: inline-block;
+            font-size: 12px;
+            color: #7ab8ff;
+            background: rgba(122, 184, 255, .12);
+            border: 1px solid rgba(122, 184, 255, .3);
+            border-radius: 10px;
+            padding: 2px 10px;
+            margin-left: 8px;
+            font-family: "Microsoft YaHei";
+            vertical-align: middle;
+        }
+
+        /* ---------- 一句话展示 ---------- */
+        .wyh_quote {
+            font-size: 21px;
+            line-height: 1.9;
+            color: #e8ebf7;
+            text-align: center;
+            padding: 26px 16px;
+            min-height: 120px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px dashed rgba(255, 255, 255, .18);
+            border-left: 5px solid #7ab8ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .wyh_quote_from { font-size: 14px; color: #93a0c8; }
+        .wyh_quote_from b { color: #b48cff; }
+        .wyh_loading { color: #93a0c8; font-size: 15px; }
+
+        /* ---------- 代码展示块 ---------- */
+        .wyh_code {
+            background: #0d1126;
+            border: 1px solid rgba(255, 255, 255, .08);
+            color: #c9d6ff;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* ---------- 按钮 ---------- */
+        .wyh_btn-row { text-align: center; margin-top: 16px; }
+
+        .wyh_btn {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #4f7dff, #7ab8ff);
+            color: #fff;
+            font-size: 15px;
+        }
+
+        .wyh_btn:hover { filter: brightness(1.15); }
+        .wyh_btn:disabled { background: #3b4a6b; color: #93a0c8; cursor: not-allowed; filter: none; }
+
+        /* ---------- 原始 JSON 结果展示块 ---------- */
+        .wyh_result {
+            background: rgba(255, 255, 255, .04);
+            border: 1px dashed rgba(255, 255, 255, .18);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 13px;
+            line-height: 1.9;
+            word-break: break-all;
+            font-family: Consolas, monospace;
+            color: #d6def5;
+        }
+
+        .wyh_tip { margin-top: 16px; font-size: 13px; color: #93a0c8; }
+
+        .wyh_foot {
+            text-align: center;
+            color: #6f7ba0;
+            font-size: 12.5px;
+            margin-top: 26px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wyh_container">
+        <a href="index.html" class="wyh_back-link">← 返回首页</a>
+        <h1 class="wyh_title">fetch 获取接口数据并展示</h1>
+        <p class="wyh_subtitle">王云鹤 —— 使用原生 fetch 请求「一言」接口（支持跨域），点击按钮获取随机句子</p>
+
+        <!-- 接口说明 -->
+        <div class="wyh_card">
+            <h2>接口说明</h2>
+            <div class="wyh_code">接口地址：https://v1.hitokoto.cn/?encode=json
+请求方式：GET（服务端已配置 CORS，允许跨域访问）
+返回 JSON：{ "hitokoto": "句子内容", "from": "出处", "from_who": "作者", ... }</div>
+            <div class="wyh_code">fetch("https://v1.hitokoto.cn/?encode=json")
+  .then(function (wyh_res) { return wyh_res.json(); })
+  .then(function (wyh_data) { /* 渲染数据 */ })
+  .catch(function (wyh_err) { /* 错误处理 */ });</div>
+        </div>
+
+        <!-- 接口数据展示 -->
+        <div class="wyh_card">
+            <h2>接口返回的数据展示<span class="wyh_badge" id="wyh_sourceBadge">数据来源：请求中…</span></h2>
+            <div class="wyh_quote" id="wyh_quoteBox">
+                <span class="wyh_loading">正在请求接口……</span>
+            </div>
+            <div class="wyh_btn-row">
+                <button class="wyh_btn" id="wyh_btn" type="button">换一句</button>
+            </div>
+            <p class="wyh_tip">接口原始 JSON 返回：</p>
+            <div class="wyh_result" id="wyh_resultArea">等待请求……</div>
+        </div>
+
+        <p class="wyh_foot">王云鹤 · 24002060416 · 计算机24006 · 高级网页设计 17-2 ｜ 原生 fetch 带超时与本地兜底，断网也能正常演示</p>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // ===== 使用原生 fetch 获取接口数据（带超时与本地兜底） =====
+            // 主接口：一言（国内可访问，支持跨域）
+            var wyh_api = "https://v1.hitokoto.cn/?encode=json&charset=utf-8";
+
+            // 兜底数据：网络不可用时使用，保证页面正常演示
+            var wyh_fallback = [
+                { hitokoto: "生活不是等待风暴过去，而是学会在雨中跳舞。", from: "名言", from_who: "佚名" },
+                { hitokoto: "代码写得好，不如先想清楚。", from: "课堂笔记", from_who: "王云鹤" },
+                { hitokoto: "学而不思则罔，思而不学则殆。", from: "论语", from_who: "孔子" }
+            ];
+
+            // 带超时控制的 fetch，避免接口无响应时页面一直等待
+            function wyh_fetchWithTimeout(wyh_url, wyh_ms) {
+                var wyh_controller = new AbortController();
+                var wyh_timer = setTimeout(function () { wyh_controller.abort(); }, wyh_ms);
+                return fetch(wyh_url, { signal: wyh_controller.signal })
+                    .then(function (wyh_res) { return wyh_res.json(); })
+                    .finally(function () { clearTimeout(wyh_timer); });
+            }
+
+            // 渲染一句话
+            function wyh_renderQuote(wyh_data, wyh_source) {
+                document.getElementById("wyh_quoteBox").innerHTML =
+                    '<div>“' + wyh_data.hitokoto + '”</div>' +
+                    '<div class="wyh_quote_from">—— <b>' + (wyh_data.from_who || "佚名") + '</b> · ' +
+                    (wyh_data.from || "未知出处") + '</div>';
+                document.getElementById("wyh_sourceBadge").innerHTML = "数据来源：" + wyh_source;
+                document.getElementById("wyh_resultArea").innerHTML = JSON.stringify(wyh_data, null, 2);
+                console.log("接口返回数据：", wyh_data);
+            }
+
+            function wyh_loadQuote() {
+                var wyh_btn = document.getElementById("wyh_btn");
+                var wyh_box = document.getElementById("wyh_quoteBox");
+                wyh_btn.disabled = true;
+                wyh_btn.innerHTML = "请求中…";
+                wyh_box.innerHTML = '<span class="wyh_loading">正在请求接口……</span>';
+                document.getElementById("wyh_sourceBadge").innerHTML = "数据来源：请求中…";
+
+                wyh_fetchWithTimeout(wyh_api, 4000)
+                    .then(function (wyh_data) {
+                        // 校验数据是否有效
+                        if (!wyh_data || !wyh_data.hitokoto) { throw new Error("接口返回数据异常"); }
+                        wyh_renderQuote(wyh_data, "一言接口（在线）");
+                    })
+                    .catch(function (wyh_err) {
+                        console.log("在线接口请求失败，使用本地兜底数据：", wyh_err);
+                        var wyh_idx = Math.floor(Math.random() * wyh_fallback.length);
+                        wyh_renderQuote(wyh_fallback[wyh_idx], "本地兜底数据（接口请求失败：" + wyh_err.message + "）");
+                    })
+                    .finally(function () {
+                        wyh_btn.disabled = false;
+                        wyh_btn.innerHTML = "换一句";
+                    });
+            }
+
+            // 绑定按钮点击事件
+            document.getElementById("wyh_btn").addEventListener("click", wyh_loadQuote);
+
+            // 页面加载后自动请求一次
+            wyh_loadQuote();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-02 功能：fetch获取商品列表并展示（在线接口+内置数据兜底） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品列表 - fetch</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            color: #e8ebf7;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            padding: 48px 20px 70px;
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+        .wyh_container { max-width: 1100px; margin: 0 auto; }
+
+        /* ---------- 返回链接 ---------- */
+        .wyh_back {
+            display: inline-block; margin-bottom: 16px; color: #93a0c8;
+            text-decoration: none; font-size: 14px; letter-spacing: 1px; transition: color .2s;
+        }
+        .wyh_back:hover { color: #7ab8ff; }
+
+        /* ---------- 标题区 ---------- */
+        .wyh_title {
+            text-align: center; font-size: 32px; letter-spacing: 3px; margin-bottom: 10px;
+            background: linear-gradient(90deg, #7ab8ff, #b48cff, #63e6be);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .wyh_subtitle { text-align: center; color: #93a0c8; font-size: 14px; letter-spacing: 1px; margin-bottom: 20px; }
+        .wyh_subtitle b { color: #7ab8ff; font-weight: 600; }
+
+        /* ---------- API 调用流程代码块 ---------- */
+        .wyh_api {
+            background: #0d1126; border: 1px solid rgba(255,255,255,.08); border-radius: 12px;
+            color: #c9d6ff; font-family: Consolas, monospace; font-size: 12.5px; line-height: 1.9;
+            padding: 14px 22px; max-width: 680px; margin: 0 auto 24px; white-space: pre-line;
+        }
+        .wyh_api em { color: #63e6be; font-style: normal; }
+        .wyh_api i { color: #ffb26b; font-style: normal; }
+
+        /* ---------- 工具条：来源徽章 + 重新加载 ---------- */
+        .wyh_toolbar { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 26px; }
+        .wyh_source {
+            display: inline-block; font-size: 12px; color: #63e6be;
+            background: rgba(99,230,190,.12); border: 1px solid rgba(99,230,190,.35);
+            border-radius: 999px; padding: 4px 14px;
+        }
+        .wyh_source_warn { color: #ffb26b; background: rgba(255,178,107,.12); border-color: rgba(255,178,107,.35); }
+        .wyh_btn {
+            padding: 6px 18px; border: 1px solid rgba(122,184,255,.5); border-radius: 999px;
+            background: rgba(122,184,255,.1); color: #7ab8ff; font-size: 13px;
+            font-family: inherit; cursor: pointer; transition: background .2s, color .2s;
+        }
+        .wyh_btn:hover { background: rgba(122,184,255,.25); color: #ffffff; }
+
+        /* ---------- 商品卡片网格 ---------- */
+        .wyh_grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+        .wyh_card {
+            background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 14px; overflow: hidden; cursor: pointer;
+            transition: transform .25s, border-color .25s, box-shadow .25s;
+        }
+        .wyh_card:hover {
+            transform: translateY(-6px); border-color: rgba(122,184,255,.55);
+            box-shadow: 0 12px 28px rgba(0,0,0,.35), 0 0 14px rgba(122,184,255,.18);
+        }
+        .wyh_card_img {
+            height: 180px; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,.04); padding: 14px; font-size: 64px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        .wyh_card_img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .wyh_card_info { padding: 12px 14px 16px; }
+        .wyh_card_title {
+            font-size: 14px; color: #e8ebf7; line-height: 1.5; height: 42px; overflow: hidden;
+            text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        }
+        .wyh_card_row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+        .wyh_price { color: #ffb26b; font-size: 18px; font-weight: 900; }
+        .wyh_price small { font-size: 12px; }
+        .wyh_rating { color: #ffd479; font-size: 13px; }
+        .wyh_cate {
+            display: inline-block; margin-top: 8px; font-size: 12px; color: #7ab8ff;
+            background: rgba(122,184,255,.12); border-radius: 999px; padding: 2px 10px;
+        }
+        .wyh_tip { text-align: center; color: #93a0c8; font-size: 13px; margin-top: 22px; }
+        .wyh_tip b { color: #7ab8ff; font-weight: 600; }
+        .wyh_loading { grid-column: 1 / -1; text-align: center; color: #93a0c8; padding: 60px 0; font-size: 15px; }
+        .wyh_error { color: #ff7b72; }
+
+        /* ---------- 骨架屏 ---------- */
+        .wyh_skeleton { cursor: default; }
+        .wyh_skeleton:hover { transform: none; border-color: rgba(255,255,255,.1); box-shadow: none; }
+        .wyh_sk_img, .wyh_sk_line {
+            background: linear-gradient(90deg, rgba(255,255,255,.05) 25%, rgba(255,255,255,.14) 37%, rgba(255,255,255,.05) 63%);
+            background-size: 400% 100%;
+            animation: wyh_shimmer 1.2s ease infinite;
+        }
+        .wyh_sk_img { height: 180px; border-bottom: 1px solid rgba(255,255,255,.08); }
+        .wyh_sk_line { height: 14px; border-radius: 6px; margin-bottom: 10px; }
+        .wyh_sk_short { width: 60%; margin-bottom: 0; }
+        @keyframes wyh_shimmer {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0 50%; }
+        }
+
+        /* ---------- 页脚 ---------- */
+        .wyh_foot { text-align: center; color: #6f7ba0; font-size: 12.5px; margin-top: 34px; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <div class="wyh_container">
+        <a href="index.html" class="wyh_back">← 返回首页</a>
+        <h1 class="wyh_title">商品列表 · fetch</h1>
+        <p class="wyh_subtitle">王云鹤 —— 使用 <b>fetch</b> 获取接口数据（在线接口失败自动兜底，点击卡片查看详情）</p>
+
+        <div class="wyh_api">fetch("https://fakestoreapi.com/products?limit=8")　// 首选在线接口 · AbortController 3 秒超时
+  ├── 请求成功 ──→ 渲染商品卡片 · 数据来源：<em>FakeStoreAPI 接口（在线）</em>
+  └── 失败 / 超时 ──→ 改用 JS 内置 <i>wyh_products</i> 数组兜底渲染</div>
+
+        <div class="wyh_toolbar">
+            <span class="wyh_source" id="wyh_source">数据来源：加载中…</span>
+            <button class="wyh_btn" onclick="wyh_loadList()">重新加载</button>
+        </div>
+
+        <div class="wyh_grid" id="wyh_grid">
+            <div class="wyh_loading">正在通过 fetch 加载商品列表……</div>
+        </div>
+        <p class="wyh_tip">提示：点击任意商品卡片，跳转到 <b>17-3-detail.html?id=商品ID</b> 查看详情</p>
+    </div>
+
+    <p class="wyh_foot">王云鹤 · 24002060416 · 计算机24006 · 高级网页设计 17-3 ｜ 点击商品卡片可进入详情页</p>
+
+    <script>
+        // ===== 首选接口：FakeStoreAPI（在线），失败时使用 JS 内置数据兜底 =====
+        var wyh_api = { name: "FakeStoreAPI 接口（在线）", url: "https://fakestoreapi.com/products?limit=8" };
+        var wyh_localName = "本地内置数据（在线接口不可用）";
+
+        // 内置兜底数据：8 个商品，字段结构与在线接口返回保持一致
+        var wyh_products = [
+            { id: 1, title: "无线蓝牙降噪耳机", price: 299, category: "数码影音", rating: 4.7, image: "", emoji: "🎧",
+              description: "主动降噪、40 小时超长续航，佩戴轻若无物，通勤与学习两相宜。",
+              stock: 128, discount: 15, tags: ["蓝牙5.3", "主动降噪", "长续航"], images: ["🎧", "🎵", "📦"] },
+            { id: 2, title: "87键机械键盘", price: 459, category: "电脑外设", rating: 4.8, image: "", emoji: "⌨️",
+              description: "热插拔轴体、RGB 背光，敲击手感清脆利落，写代码打游戏都得劲。",
+              stock: 86, discount: 10, tags: ["热插拔", "RGB背光", "全键无冲"], images: ["⌨️", "💡", "📦"] },
+            { id: 3, title: "智能运动手表", price: 699, category: "智能穿戴", rating: 4.6, image: "", emoji: "⌚",
+              description: "心率血氧全天监测，百余种运动模式，14 天续航告别每日一充。",
+              stock: 64, discount: 12, tags: ["心率监测", "运动模式", "14天续航"], images: ["⌚", "🏃", "📦"] },
+            { id: 4, title: "便携蓝牙音箱", price: 199, category: "数码影音", rating: 4.5, image: "", emoji: "🔊",
+              description: "360° 环绕立体声，IPX7 防水，口袋大小却能撑起整个宿舍的气氛。",
+              stock: 210, discount: 20, tags: ["360°音效", "IPX7防水", "便携"], images: ["🔊", "🎶", "📦"] },
+            { id: 5, title: "无线电竞鼠标", price: 159, category: "电脑外设", rating: 4.4, image: "", emoji: "🖱️",
+              description: "26000 DPI 电竞级传感器，58g 轻量化机身，指哪打哪快人一步。",
+              stock: 156, discount: 8, tags: ["轻量化", "高DPI", "双模连接"], images: ["🖱️", "⚡", "📦"] },
+            { id: 6, title: "笔记本电脑支架", price: 89, category: "电脑外设", rating: 4.3, image: "", emoji: "💻",
+              description: "铝合金折叠升降设计，护颈护腕，让图书馆自习的颈椎舒服一点。",
+              stock: 300, discount: 0, tags: ["铝合金", "可折叠", "护颈"], images: ["💻", "🛠️", "📦"] },
+            { id: 7, title: "手工陶瓷马克杯", price: 39, category: "生活家居", rating: 4.8, image: "", emoji: "🍵",
+              description: "哑光釉面温润如玉，450ml 大容量，装得下咖啡也装得下下午的困意。",
+              stock: 520, discount: 0, tags: ["陶瓷", "大容量", "微波炉可用"], images: ["🍵", "☕", "📦"] },
+            { id: 8, title: "简约帆布托特包", price: 69, category: "时尚穿搭", rating: 4.6, image: "", emoji: "🎒",
+              description: "加厚帆布耐磨能装，课本电脑一包带走，通勤上课都百搭。",
+              stock: 410, discount: 5, tags: ["加厚帆布", "大容量", "百搭"], images: ["🎒", "👕", "📦"] }
+        ];
+
+        // 带超时的 fetch：避免接口无响应时页面一直等
+        function wyh_fetchJson(wyh_url, wyh_ms) {
+            var wyh_controller = new AbortController();
+            var wyh_timer = setTimeout(function () { wyh_controller.abort(); }, wyh_ms);
+            return fetch(wyh_url, { signal: wyh_controller.signal })
+                .then(function (wyh_res) {
+                    if (!wyh_res.ok) { throw new Error("HTTP " + wyh_res.status); }
+                    return wyh_res.json();
+                })
+                .finally(function () { clearTimeout(wyh_timer); });
+        }
+
+        // 把不同接口的返回统一成同一种结构
+        function wyh_normalizeList(wyh_data) {
+            var wyh_raw = wyh_data.products || wyh_data;   // dummyjson 有 products 包裹，其余是数组
+            if (!wyh_raw || !wyh_raw.length) { throw new Error("返回数据结构异常"); }
+            var wyh_list = [];
+            for (var wyh_i = 0; wyh_i < wyh_raw.length; wyh_i++) {
+                var wyh_p = wyh_raw[wyh_i];
+                wyh_list.push({
+                    id: wyh_p.id,
+                    title: wyh_p.title,
+                    price: wyh_p.price,
+                    brand: wyh_p.brand || wyh_p.category || "未分类",
+                    // rating 可能是 { rate } 对象，也可能是数字
+                    rating: typeof wyh_p.rating === "object" && wyh_p.rating !== null ? wyh_p.rating.rate : wyh_p.rating,
+                    img: wyh_p.thumbnail || wyh_p.image || "",
+                    emoji: wyh_p.emoji || ""
+                });
+            }
+            return wyh_list;
+        }
+
+        // 渲染商品卡片
+        function wyh_renderList(wyh_list) {
+            var wyh_html = "";
+            for (var wyh_i = 0; wyh_i < wyh_list.length; wyh_i++) {
+                var wyh_p = wyh_list[wyh_i];
+                var wyh_media = wyh_p.img
+                    ? '<img src="' + wyh_p.img + '" alt="' + wyh_p.title + '" loading="lazy" decoding="async">'
+                    : (wyh_p.emoji || "📦");
+                wyh_html += '<div class="wyh_card" onclick="wyh_goDetail(' + wyh_p.id + ')">' +
+                    '<div class="wyh_card_img">' + wyh_media + '</div>' +
+                    '<div class="wyh_card_info">' +
+                        '<div class="wyh_card_title">' + wyh_p.title + '</div>' +
+                        '<div class="wyh_card_row">' +
+                            '<span class="wyh_price"><small>¥</small>' + wyh_p.price + '</span>' +
+                            '<span class="wyh_rating">★ ' + wyh_p.rating + '</span>' +
+                        '</div>' +
+                        '<span class="wyh_cate">' + wyh_p.brand + '</span>' +
+                    '</div>' +
+                '</div>';
+            }
+            document.getElementById("wyh_grid").innerHTML = wyh_html;
+        }
+
+        // 骨架屏占位，缩短“感知等待时间”
+        function wyh_skeleton() {
+            var wyh_html = "";
+            for (var wyh_i = 0; wyh_i < 8; wyh_i++) {
+                wyh_html += '<div class="wyh_card wyh_skeleton">' +
+                    '<div class="wyh_sk_img"></div>' +
+                    '<div class="wyh_card_info">' +
+                        '<div class="wyh_sk_line"></div>' +
+                        '<div class="wyh_sk_line wyh_sk_short"></div>' +
+                    '</div></div>';
+            }
+            document.getElementById("wyh_grid").innerHTML = wyh_html;
+        }
+
+        // ===== 只发一个请求：FakeStoreAPI，3 秒超时，失败直接用内置数据 =====
+        function wyh_loadList() {
+            wyh_skeleton();
+            var wyh_badge = document.getElementById("wyh_source");
+            wyh_badge.className = "wyh_source";
+            wyh_badge.innerHTML = "数据来源：加载中…";
+
+            wyh_fetchJson(wyh_api.url, 3000)
+                .then(function (wyh_data) {
+                    console.log("接口请求成功：" + wyh_api.url, wyh_data);
+                    wyh_renderList(wyh_normalizeList(wyh_data));
+                    wyh_badge.innerHTML = "数据来源：" + wyh_api.name;
+                })
+                .catch(function (wyh_err) {
+                    // 在线接口失败：立即使用 JS 内置数据兜底
+                    console.log("在线接口失败：" + wyh_err.message + "，改用 JS 内置数据兜底");
+                    wyh_renderList(wyh_normalizeList(wyh_products));
+                    wyh_badge.className = "wyh_source wyh_source_warn";
+                    wyh_badge.innerHTML = "数据来源：" + wyh_localName;
+                });
+        }
+
+        // 跳转详情页，通过 URL 参数传递商品 id
+        function wyh_goDetail(wyh_id) {
+            location.href = "17-3-detail.html?id=" + wyh_id;
+        }
+
+        // 页面加载后开始请求
+        wyh_loadList();
+    </script>
+</body>
+</html>

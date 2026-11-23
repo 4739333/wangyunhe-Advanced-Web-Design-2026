@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-02 功能：远程数据接口测试工具（GET/POST等） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>远程数据接口测试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            color: #e8ebf7; padding: 48px 20px 70px; min-height: 100vh; line-height: 1.7;
+        }
+        .wyh_container { max-width: 1000px; margin: 0 auto; }
+        .wyh_back {
+            display: inline-block; margin-bottom: 14px; color: #93a0c8;
+            text-decoration: none; font-size: 14px;
+        }
+        .wyh_back:hover { color: #7ab8ff; }
+        .wyh_title {
+            text-align: center; font-size: 32px; letter-spacing: 3px; margin-bottom: 10px;
+            background: linear-gradient(90deg, #7ab8ff, #b48cff, #63e6be);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .wyh_subtitle { text-align: center; color: #93a0c8; margin-bottom: 24px; font-size: 14px; letter-spacing: 1px; }
+        .wyh_card {
+            background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 14px; padding: 20px 24px; margin-bottom: 16px;
+        }
+        .wyh_card h2 { font-size: 16px; color: #7ab8ff; margin-bottom: 12px; letter-spacing: 1px; }
+        .wyh_row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+        .wyh_label { font-size: 13px; color: #93a0c8; flex-shrink: 0; }
+        .wyh_input, .wyh_select, .wyh_textarea {
+            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.18);
+            color: #e8ebf7; border-radius: 8px; font-size: 14px; outline: none;
+            font-family: Consolas, "Microsoft YaHei", monospace; padding: 8px 10px;
+        }
+        .wyh_input:focus, .wyh_select:focus, .wyh_textarea:focus { border-color: #7ab8ff; }
+        .wyh_select option { background: #1c2340; color: #e8ebf7; }
+        .wyh_input_url { flex: 1; min-width: 320px; }
+        .wyh_input_small { width: 90px; }
+        .wyh_textarea { width: 100%; min-height: 110px; line-height: 1.7; resize: vertical; }
+        .wyh_btn {
+            padding: 9px 20px; border: none; border-radius: 10px; cursor: pointer;
+            background: linear-gradient(90deg, #4f7dff, #7ab8ff); color: #fff; font-size: 14px;
+        }
+        .wyh_btn:hover { opacity: .88; }
+        .wyh_btn:disabled { background: #3b4468; color: #93a0c8; cursor: not-allowed; }
+        .wyh_presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+        .wyh_preset {
+            font-size: 12px; padding: 6px 12px; border-radius: 14px; cursor: pointer;
+            border: 1px solid rgba(255,255,255,.25); background: transparent; color: #b9c3e2;
+        }
+        .wyh_preset:hover { border-color: #7ab8ff; color: #7ab8ff; }
+
+        /* 状态条 */
+        .wyh_status {
+            display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
+            font-size: 14px; padding: 12px 16px; border-radius: 10px; margin-bottom: 14px;
+            background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12);
+        }
+        .wyh_status b { color: #e8ebf7; }
+        .wyh_status_ok { background: rgba(99,230,190,.08); border-color: rgba(99,230,190,.4); }
+        .wyh_status_ok b { color: #63e6be; }
+        .wyh_status_err { background: rgba(255,138,138,.08); border-color: rgba(255,138,138,.4); }
+        .wyh_status_err b { color: #ff8a8a; }
+        .wyh_code {
+            background: #0d1126; border: 1px solid rgba(255,255,255,.08); color: #c9d6ff;
+            padding: 12px 14px; border-radius: 10px;
+            font-family: Consolas, monospace; font-size: 13px; line-height: 1.75;
+            overflow: auto; max-height: 360px; white-space: pre-wrap; word-break: break-all;
+        }
+        .wyh_code_err { background: #170d18; color: #ff8a8a; }
+        .wyh_hint { font-size: 12px; color: #6f7ba0; margin-top: 8px; }
+        .wyh_tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+        .wyh_tab_btn {
+            font-size: 13px; padding: 6px 14px; border-radius: 8px; cursor: pointer;
+            border: 1px solid rgba(255,255,255,.18); background: transparent; color: #93a0c8;
+        }
+        .wyh_tab_btn.wyh_active {
+            background: linear-gradient(90deg, #4f7dff, #7ab8ff); color: #fff; border-color: transparent;
+        }
+        .wyh_foot { text-align: center; color: #6f7ba0; font-size: 12.5px; margin-top: 26px; }
+    </style>
+</head>
+<body>
+    <div class="wyh_container">
+        <a href="index.html" class="wyh_back">← 返回首页</a>
+        <h1 class="wyh_title">远程数据接口测试</h1>
+        <p class="wyh_subtitle">王云鹤 —— 支持 GET / POST / PUT / PATCH / DELETE，显示接口返回的数据与错误提示</p>
+
+        <!-- 请求配置 -->
+        <div class="wyh_card">
+            <h2>一、请求配置</h2>
+            <div class="wyh_row">
+                <select class="wyh_select" id="wyh_method">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+                <input class="wyh_input wyh_input_url" id="wyh_url" value="https://jsonplaceholder.typicode.com/posts">
+                <span class="wyh_label">超时</span>
+                <input class="wyh_input wyh_input_small" type="number" id="wyh_timeout" value="8000" min="200" step="500">
+                <span class="wyh_label">毫秒</span>
+                <button class="wyh_btn" id="wyh_sendBtn" onclick="wyh_send()">发送请求</button>
+            </div>
+
+            <div class="wyh_row">
+                <span class="wyh_label">请求体（JSON，POST/PUT/PATCH 时使用）：</span>
+            </div>
+            <textarea class="wyh_textarea" id="wyh_body">{
+  "title": "王云鹤的接口测试",
+  "body": "这是一条通过 fetch POST 提交的数据",
+  "userId": 1
+}</textarea>
+
+            <div class="wyh_row" style="margin-top:12px;">
+                <span class="wyh_label">快速示例：</span>
+                <div class="wyh_presets">
+                    <span class="wyh_preset" onclick="wyh_preset('get')">GET 列表 /posts</span>
+                    <span class="wyh_preset" onclick="wyh_preset('getOne')">GET 单条 /posts/1</span>
+                    <span class="wyh_preset" onclick="wyh_preset('post')">POST 新增 /posts</span>
+                    <span class="wyh_preset" onclick="wyh_preset('put')">PUT 修改 /posts/1</span>
+                    <span class="wyh_preset" onclick="wyh_preset('404')">404 错误演示</span>
+                    <span class="wyh_preset" onclick="wyh_preset('network')">网络错误演示</span>
+                    <span class="wyh_preset" onclick="wyh_preset('timeout')">超时错误演示</span>
+                </div>
+            </div>
+            <p class="wyh_hint">提示：jsonplaceholder 为公开测试接口，GET 可查询、POST 会返回新增的数据（模拟保存，不会真正写入）。</p>
+        </div>
+
+        <!-- 响应结果 -->
+        <div class="wyh_card">
+            <h2>二、返回结果</h2>
+            <div class="wyh_status" id="wyh_status">
+                <span>状态：<span id="wyh_statusText">等待发送请求…</span></span>
+            </div>
+
+            <div class="wyh_tabs">
+                <span class="wyh_tab_btn wyh_active" id="wyh_tabData" onclick="wyh_switchTab(0)">返回数据</span>
+                <span class="wyh_tab_btn" id="wyh_tabErr" onclick="wyh_switchTab(1)">错误信息</span>
+                <span class="wyh_tab_btn" id="wyh_tabReq" onclick="wyh_switchTab(2)">请求详情</span>
+            </div>
+
+            <div class="wyh_code" id="wyh_dataBox">暂无数据，点击“发送请求”开始测试。</div>
+            <div class="wyh_code wyh_code_err" id="wyh_errBox" style="display:none;">暂无错误信息。</div>
+            <div class="wyh_code" id="wyh_reqBox" style="display:none;">暂无请求记录。</div>
+        </div>
+    </div>
+
+    <p class="wyh_foot">王云鹤 · 24002060416 · 计算机24006 · 高级网页设计 17-4 ｜ 输入接口地址与请求体，一键发送 fetch 查看返回数据与错误详情</p>
+
+    <script>
+        // ===== 切换结果面板 =====
+        function wyh_switchTab(wyh_idx) {
+            var wyh_boxes = ["wyh_dataBox", "wyh_errBox", "wyh_reqBox"];
+            var wyh_tabs = ["wyh_tabData", "wyh_tabErr", "wyh_tabReq"];
+            for (var wyh_i = 0; wyh_i < wyh_boxes.length; wyh_i++) {
+                document.getElementById(wyh_boxes[wyh_i]).style.display = wyh_i === wyh_idx ? "block" : "none";
+                document.getElementById(wyh_tabs[wyh_i]).className =
+                    "wyh_tab_btn" + (wyh_i === wyh_idx ? " wyh_active" : "");
+            }
+        }
+
+        // ===== 快速示例 =====
+        function wyh_preset(wyh_type) {
+            var wyh_urlEl = document.getElementById("wyh_url");
+            var wyh_methodEl = document.getElementById("wyh_method");
+            var wyh_bodyEl = document.getElementById("wyh_body");
+            var wyh_timeoutEl = document.getElementById("wyh_timeout");
+            if (wyh_type === "get") {
+                wyh_methodEl.value = "GET";
+                wyh_urlEl.value = "https://jsonplaceholder.typicode.com/posts";
+                wyh_timeoutEl.value = 8000;
+            } else if (wyh_type === "getOne") {
+                wyh_methodEl.value = "GET";
+                wyh_urlEl.value = "https://jsonplaceholder.typicode.com/posts/1";
+                wyh_timeoutEl.value = 8000;
+            } else if (wyh_type === "post") {
+                wyh_methodEl.value = "POST";
+                wyh_urlEl.value = "https://jsonplaceholder.typicode.com/posts";
+                wyh_bodyEl.value = '{\n  "title": "王云鹤的接口测试",\n  "body": "这是一条通过 fetch POST 提交的数据",\n  "userId": 1\n}';
+                wyh_timeoutEl.value = 8000;
+            } else if (wyh_type === "put") {
+                wyh_methodEl.value = "PUT";
+                wyh_urlEl.value = "https://jsonplaceholder.typicode.com/posts/1";
+                wyh_bodyEl.value = '{\n  "id": 1,\n  "title": "修改后的标题",\n  "body": "PUT 请求提交的内容",\n  "userId": 1\n}';
+                wyh_timeoutEl.value = 8000;
+            } else if (wyh_type === "404") {
+                wyh_methodEl.value = "GET";
+                wyh_urlEl.value = "https://jsonplaceholder.typicode.com/posts/99999";
+                wyh_timeoutEl.value = 8000;
+            } else if (wyh_type === "network") {
+                wyh_methodEl.value = "GET";
+                wyh_urlEl.value = "https://this-api-does-not-exist-12345.com/data";
+                wyh_timeoutEl.value = 8000;
+            } else if (wyh_type === "timeout") {
+                wyh_methodEl.value = "GET";
+                wyh_urlEl.value = "https://jsonplaceholder.typicode.com/posts";
+                wyh_timeoutEl.value = 1;
+            }
+        }
+
+        // ===== 发送请求（核心：fetch + 超时控制 + 错误分类提示） =====
+        function wyh_send() {
+            var wyh_method = document.getElementById("wyh_method").value;
+            var wyh_url = document.getElementById("wyh_url").value.trim();
+            var wyh_timeoutMs = Number(document.getElementById("wyh_timeout").value) || 8000;
+            var wyh_bodyText = document.getElementById("wyh_body").value.trim();
+            var wyh_sendBtn = document.getElementById("wyh_sendBtn");
+
+            if (!wyh_url) {
+                wyh_showError("请求地址不能为空，请填写接口 URL。");
+                return;
+            }
+
+            // 构造请求参数
+            var wyh_options = { method: wyh_method, headers: {} };
+            if (wyh_method === "POST" || wyh_method === "PUT" || wyh_method === "PATCH") {
+                wyh_options.headers["Content-Type"] = "application/json;charset=utf-8";
+                // 校验请求体是否为合法 JSON
+                if (wyh_bodyText) {
+                    try {
+                        JSON.parse(wyh_bodyText);
+                    } catch (wyh_e) {
+                        wyh_showError("请求体不是合法的 JSON：" + wyh_e.message);
+                        return;
+                    }
+                    wyh_options.body = wyh_bodyText;
+                }
+            }
+
+            // 超时控制（AbortController）
+            var wyh_controller = new AbortController();
+            var wyh_timer = setTimeout(function () { wyh_controller.abort(); }, wyh_timeoutMs);
+            wyh_options.signal = wyh_controller.signal;
+
+            wyh_sendBtn.disabled = true;
+            wyh_sendBtn.innerHTML = "请求中…";
+            document.getElementById("wyh_statusText").innerHTML = "请求中…";
+            document.getElementById("wyh_status").className = "wyh_status";
+            document.getElementById("wyh_reqBox").innerHTML =
+                "请求方法：" + wyh_method + "\n请求地址：" + wyh_url +
+                "\n超时设置：" + wyh_timeoutMs + " 毫秒" +
+                (wyh_options.body ? "\n请求体：\n" + wyh_bodyText : "\n请求体：无");
+
+            var wyh_startTime = performance.now();
+
+            fetch(wyh_url, wyh_options)
+                .then(function (wyh_res) {
+                    var wyh_cost = Math.round(performance.now() - wyh_startTime);
+                    console.log("HTTP 状态：" + wyh_res.status, wyh_res);
+                    return wyh_res.text().then(function (wyh_text) {
+                        return { res: wyh_res, text: wyh_text, cost: wyh_cost };
+                    });
+                })
+                .then(function (wyh_result) {
+                    var wyh_res = wyh_result.res;
+                    var wyh_text = wyh_result.text;
+                    var wyh_cost = wyh_result.cost;
+
+                    // 尝试格式化 JSON，失败则原样显示文本
+                    var wyh_pretty = wyh_text;
+                    var wyh_isJson = false;
+                    try {
+                        wyh_pretty = JSON.stringify(JSON.parse(wyh_text), null, 2);
+                        wyh_isJson = true;
+                    } catch (wyh_e) { /* 非 JSON 响应，保持原样 */ }
+
+                    document.getElementById("wyh_dataBox").innerHTML = wyh_pretty || "（响应体为空）";
+
+                    var wyh_statusEl = document.getElementById("wyh_status");
+                    var wyh_statusTxt = document.getElementById("wyh_statusText");
+
+                    if (wyh_res.ok) {
+                        // 2xx 成功
+                        wyh_statusEl.className = "wyh_status wyh_status_ok";
+                        wyh_statusTxt.innerHTML =
+                            "请求成功　状态码 <b>" + wyh_res.status + " " + (wyh_res.statusText || "") +
+                            "</b>　耗时 <b>" + wyh_cost + " ms</b>　数据格式 <b>" + (wyh_isJson ? "JSON" : "文本") + "</b>";
+                        document.getElementById("wyh_errBox").innerHTML = "本次请求没有错误。";
+                        wyh_switchTab(0);
+                    } else {
+                        // 4xx / 5xx 业务错误
+                        wyh_statusEl.className = "wyh_status wyh_status_err";
+                        wyh_statusTxt.innerHTML =
+                            "请求失败　状态码 <b>" + wyh_res.status + " " + (wyh_res.statusText || "") +
+                            "</b>　耗时 <b>" + wyh_cost + " ms</b>";
+                        document.getElementById("wyh_errBox").innerHTML =
+                            "HTTP 错误：服务器返回 " + wyh_res.status + " " + (wyh_res.statusText || "") +
+                            "\n\n返回内容：\n" + (wyh_text || "（无响应体）") +
+                            "\n\n说明：404 表示接口路径不存在；500 表示服务器内部错误。";
+                        wyh_switchTab(1);
+                    }
+
+                    document.getElementById("wyh_reqBox").innerHTML +=
+                        "\n\n响应状态：" + wyh_res.status + " " + (wyh_res.statusText || "") +
+                        "\n响应类型：" + (wyh_res.headers.get("content-type") || "未提供") +
+                        "\n总耗时：" + wyh_cost + " ms";
+                    wyh_finish();
+                })
+                .catch(function (wyh_err) {
+                    var wyh_cost = Math.round(performance.now() - wyh_startTime);
+                    var wyh_msg;
+                    if (wyh_err.name === "AbortError") {
+                        // 超时导致的主动中断
+                        wyh_msg = "请求超时：超过 " + wyh_timeoutMs + " 毫秒没有响应，已取消请求。\n" +
+                                  "可能原因：网络较慢、接口无法访问、或超时时间设置过短。\n" +
+                                  "建议：适当增大超时时间或更换接口地址。";
+                    } else if (wyh_err instanceof TypeError) {
+                        // 网络层错误：域名解析失败、断网、CORS 被拦截
+                        wyh_msg = "网络错误：" + wyh_err.message + "\n" +
+                                  "可能原因：域名无法解析、网络断开、或接口未开启 CORS 跨域允许。";
+                    } else {
+                        wyh_msg = "请求异常：" + wyh_err.message;
+                    }
+                    wyh_showError(wyh_msg, wyh_cost);
+                })
+                .finally(function () {
+                    clearTimeout(wyh_timer);
+                });
+        }
+
+        // 显示错误信息
+        function wyh_showError(wyh_msg, wyh_cost) {
+            document.getElementById("wyh_status").className = "wyh_status wyh_status_err";
+            document.getElementById("wyh_statusText").innerHTML =
+                "请求失败" + (wyh_cost !== undefined ? "　耗时 <b>" + wyh_cost + " ms</b>" : "");
+            document.getElementById("wyh_errBox").innerHTML = wyh_msg;
+            wyh_switchTab(1);
+            wyh_finish();
+            console.error("接口测试错误：", wyh_msg);
+        }
+
+        // 恢复按钮状态
+        function wyh_finish() {
+            var wyh_sendBtn = document.getElementById("wyh_sendBtn");
+            wyh_sendBtn.disabled = false;
+            wyh_sendBtn.innerHTML = "发送请求";
+        }
+
+        // 页面加载后自动演示一次 GET 请求
+        window.addEventListener("load", function () {
+            wyh_send();
+        });
+    </script>
+</body>
+</html>

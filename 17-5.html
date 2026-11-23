@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-02 功能：JavaScript两种定时器演示（setTimeout与setInterval） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 两种定时器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            color: #e8ebf7; padding: 48px 20px 70px; min-height: 100vh; line-height: 1.7;
+        }
+        .wyh_container { max-width: 1040px; margin: 0 auto; }
+        .wyh_back {
+            display: inline-block; margin-bottom: 14px; color: #93a0c8;
+            text-decoration: none; font-size: 14px;
+        }
+        .wyh_back:hover { color: #7ab8ff; }
+        .wyh_title {
+            text-align: center; font-size: 32px; letter-spacing: 3px; margin-bottom: 10px;
+            background: linear-gradient(90deg, #7ab8ff, #b48cff, #63e6be);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .wyh_subtitle { text-align: center; color: #93a0c8; margin-bottom: 24px; font-size: 14px; letter-spacing: 1px; }
+
+        .wyh_grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(430px, 100%), 1fr)); gap: 18px; }
+        .wyh_card {
+            background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 14px; padding: 20px 24px;
+        }
+        .wyh_card h2 {
+            font-size: 18px; color: #7ab8ff; margin-bottom: 4px;
+            display: flex; align-items: center; gap: 8px; letter-spacing: 1px;
+        }
+        .wyh_card h2 small { font-size: 13px; color: #6f7ba0; font-weight: 400; }
+        .wyh_card_interval h2 { color: #b48cff; }
+        .wyh_desc { font-size: 13px; color: #93a0c8; line-height: 1.9; margin: 8px 0 14px; }
+        .wyh_desc b { color: #7ab8ff; }
+        .wyh_card_interval .wyh_desc b { color: #b48cff; }
+        .wyh_code {
+            background: #0d1126; border: 1px solid rgba(255,255,255,.08); color: #c9d6ff;
+            padding: 12px 14px; border-radius: 10px;
+            font-family: Consolas, monospace; font-size: 13px; line-height: 1.8;
+            margin-bottom: 14px; overflow-x: auto; white-space: pre;
+        }
+        .wyh_row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+        .wyh_label { font-size: 13px; color: #93a0c8; }
+        .wyh_input {
+            width: 100px; padding: 8px 10px; background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.18); color: #e8ebf7; border-radius: 8px;
+            font-size: 14px; outline: none;
+        }
+        .wyh_input:focus { border-color: #7ab8ff; }
+        .wyh_btn {
+            padding: 8px 18px; border: none; border-radius: 10px; cursor: pointer;
+            background: linear-gradient(90deg, #4f7dff, #7ab8ff); color: #fff; font-size: 14px;
+        }
+        .wyh_btn:hover { opacity: .88; }
+        .wyh_btn:disabled { background: #3b4468; color: #93a0c8; cursor: not-allowed; }
+        .wyh_btn_purple { background: linear-gradient(90deg, #8a5cff, #b48cff); }
+        .wyh_btn_line {
+            background: transparent; border: 1px solid rgba(255,255,255,.25); color: #b9c3e2;
+        }
+        .wyh_btn_line:hover { border-color: #ff8a8a; color: #ff8a8a; opacity: 1; }
+
+        /* 展示区 */
+        .wyh_display {
+            border: 1px dashed rgba(255,255,255,.2); border-radius: 12px; padding: 18px;
+            text-align: center; margin-bottom: 12px; background: rgba(255,255,255,.03);
+        }
+        .wyh_big_num {
+            font-size: 46px; font-weight: 900; color: #7ab8ff;
+            font-family: Consolas, monospace; line-height: 1.2;
+        }
+        .wyh_big_num_purple { color: #b48cff; }
+        .wyh_state { font-size: 14px; color: #93a0c8; margin-top: 6px; }
+        .wyh_state b { color: #63e6be; }
+        .wyh_progress {
+            height: 10px; border-radius: 5px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 12px;
+        }
+        .wyh_progress_bar {
+            height: 100%; width: 0%; background: linear-gradient(90deg, #4f7dff, #7ab8ff);
+            transition: width 0.1s linear;
+        }
+        .wyh_progress_bar_purple { background: linear-gradient(90deg, #8a5cff, #b48cff); }
+
+        .wyh_log {
+            background: #0d1126; border: 1px solid rgba(255,255,255,.08);
+            border-radius: 10px; padding: 10px 12px; font-family: Consolas, monospace;
+            font-size: 12.5px; line-height: 1.8; height: 130px; overflow-y: auto; color: #c9d6ff;
+        }
+        .wyh_log div { border-bottom: 1px dashed rgba(255,255,255,.06); padding: 1px 0; }
+        .wyh_note {
+            margin-top: 20px; background: rgba(255,212,121,.07); border: 1px solid rgba(255,212,121,.35);
+            border-radius: 14px; padding: 16px 20px; font-size: 14px; color: #ffd479; line-height: 2;
+        }
+        .wyh_note b { color: #ffd479; }
+        .wyh_foot { text-align: center; color: #6f7ba0; font-size: 12.5px; margin-top: 26px; }
+    </style>
+</head>
+<body>
+    <div class="wyh_container">
+        <a href="index.html" class="wyh_back">← 返回首页</a>
+        <h1 class="wyh_title">JavaScript 的两种定时器</h1>
+        <p class="wyh_subtitle">王云鹤 —— setTimeout 一次性定时器 与 setInterval 周期性定时器</p>
+
+        <div class="wyh_grid">
+            <!-- setTimeout -->
+            <div class="wyh_card">
+                <h2>1. setTimeout</h2>
+                <p class="wyh_desc">在<b>指定时间后只执行一次</b>，可用 <b>clearTimeout()</b> 清除，避免定时器未执行就取消。</p>
+                <div class="wyh_code">var wyh_timeoutId = setTimeout(function () {
+    // 时间到，执行一次
+}, 3000);
+// 取消：clearTimeout(wyh_timeoutId);</div>
+
+                <div class="wyh_row">
+                    <span class="wyh_label">延时（毫秒）</span>
+                    <input class="wyh_input" type="number" id="wyh_delayInput" value="3000" min="500" step="500">
+                    <button class="wyh_btn" id="wyh_startTimeoutBtn" onclick="wyh_startTimeout()">开始</button>
+                    <button class="wyh_btn wyh_btn_line" id="wyh_cancelTimeoutBtn" onclick="wyh_cancelTimeout()" disabled>取消</button>
+                </div>
+
+                <div class="wyh_display">
+                    <div class="wyh_big_num" id="wyh_timeoutNum">3.0</div>
+                    <div class="wyh_state" id="wyh_timeoutState">等待开始…</div>
+                    <div class="wyh_progress"><div class="wyh_progress_bar" id="wyh_timeoutBar"></div></div>
+                </div>
+                <div class="wyh_log" id="wyh_timeoutLog"><div>这里是 setTimeout 的执行日志…</div></div>
+            </div>
+
+            <!-- setInterval -->
+            <div class="wyh_card wyh_card_interval">
+                <h2>2. setInterval <small>（周期性执行）</small></h2>
+                <p class="wyh_desc">每隔<b>指定时间就执行一次</b>，会一直重复，必须用 <b>clearInterval()</b> 停止。</p>
+                <div class="wyh_code">var wyh_intervalId = setInterval(function () {
+    wyh_count++;   // 每 1 秒执行一次
+}, 1000);
+// 停止：clearInterval(wyh_intervalId);</div>
+
+                <div class="wyh_row">
+                    <span class="wyh_label">间隔（毫秒）</span>
+                    <input class="wyh_input" type="number" id="wyh_intervalInput" value="1000" min="100" step="100">
+                    <button class="wyh_btn wyh_btn_purple" id="wyh_startIntervalBtn" onclick="wyh_startInterval()">开始</button>
+                    <button class="wyh_btn wyh_btn_line" id="wyh_stopIntervalBtn" onclick="wyh_stopInterval()" disabled>停止</button>
+                    <button class="wyh_btn wyh_btn_line" onclick="wyh_resetInterval()">重置</button>
+                </div>
+
+                <div class="wyh_display">
+                    <div class="wyh_big_num wyh_big_num_purple" id="wyh_intervalNum">0</div>
+                    <div class="wyh_state" id="wyh_intervalState">已执行 <b>0</b> 次，运行中：否</div>
+                    <div class="wyh_progress"><div class="wyh_progress_bar wyh_progress_bar_purple" id="wyh_intervalBar"></div></div>
+                </div>
+                <div class="wyh_log" id="wyh_intervalLog"><div>这里是 setInterval 的执行日志…</div></div>
+            </div>
+        </div>
+
+        <div class="wyh_note">
+            <b>两者区别：</b><b>setTimeout</b> 只执行一次（延迟执行），适合延时提示、自动关闭弹窗；
+            <b>setInterval</b> 按固定间隔反复执行，适合时钟、轮播图、计时器。
+            两者都返回一个定时器 id，分别用 <b>clearTimeout(id)</b> 和 <b>clearInterval(id)</b> 清除，
+            否则定时器会一直占用内存（页面卸载前务必清理）。
+        </div>
+    </div>
+
+    <p class="wyh_foot">王云鹤 · 24002060416 · 计算机24006 · 高级网页设计 17-5 ｜ setTimeout 只执行一次，setInterval 反复执行，页面卸载前记得清理定时器</p>
+
+    <script>
+        // ===================== 一、setTimeout 一次性定时器 =====================
+        var wyh_timeoutId = null;      // 定时器 id（用于 clearTimeout）
+        var wyh_tickId = null;         // 用于更新倒计时显示的辅助定时器
+        var wyh_startTime = 0;
+        var wyh_totalDelay = 0;
+
+        function wyh_logTimeout(wyh_msg) {
+            var wyh_log = document.getElementById("wyh_timeoutLog");
+            var wyh_time = new Date().toLocaleTimeString();
+            wyh_log.innerHTML += "<div>[" + wyh_time + "] " + wyh_msg + "</div>";
+            wyh_log.scrollTop = wyh_log.scrollHeight;
+        }
+
+        function wyh_startTimeout() {
+            wyh_cancelTimeout(true);   // 先清理上一次的定时器
+            wyh_totalDelay = Number(document.getElementById("wyh_delayInput").value) || 3000;
+            wyh_startTime = Date.now();
+
+            document.getElementById("wyh_startTimeoutBtn").disabled = true;
+            document.getElementById("wyh_cancelTimeoutBtn").disabled = false;
+            document.getElementById("wyh_timeoutState").innerHTML =
+                "计时中……将在 <b>" + wyh_totalDelay + " ms</b> 后执行一次";
+            wyh_logTimeout("setTimeout 已启动，延时 " + wyh_totalDelay + " 毫秒");
+
+            // 倒计时显示（每 50ms 刷新一次，仅为视觉演示）
+            wyh_tickId = setInterval(function () {
+                var wyh_left = wyh_totalDelay - (Date.now() - wyh_startTime);
+                if (wyh_left < 0) { wyh_left = 0; }
+                document.getElementById("wyh_timeoutNum").innerHTML = (wyh_left / 1000).toFixed(1);
+                document.getElementById("wyh_timeoutBar").style.width =
+                    ((wyh_totalDelay - wyh_left) / wyh_totalDelay * 100) + "%";
+            }, 50);
+
+            // 核心：setTimeout 只执行一次
+            wyh_timeoutId = setTimeout(function () {
+                clearInterval(wyh_tickId);
+                document.getElementById("wyh_timeoutNum").innerHTML = "0.0";
+                document.getElementById("wyh_timeoutBar").style.width = "100%";
+                document.getElementById("wyh_timeoutState").innerHTML =
+                    "<b>时间到！回调函数已执行一次</b>（不会再执行第二次）";
+                document.getElementById("wyh_startTimeoutBtn").disabled = false;
+                document.getElementById("wyh_cancelTimeoutBtn").disabled = true;
+                wyh_logTimeout("setTimeout 回调执行完毕（仅此一次）");
+                console.log("setTimeout 执行：延迟 " + wyh_totalDelay + "ms");
+                wyh_timeoutId = null;
+            }, wyh_totalDelay);
+        }
+
+        function wyh_cancelTimeout(wyh_silent) {
+            if (wyh_timeoutId !== null) {
+                clearTimeout(wyh_timeoutId);      // 清除定时器
+                clearInterval(wyh_tickId);
+                wyh_timeoutId = null;
+                document.getElementById("wyh_timeoutState").innerHTML = "定时器已被 <b>clearTimeout</b> 取消，回调不会执行";
+                document.getElementById("wyh_timeoutBar").style.width = "0%";
+                document.getElementById("wyh_startTimeoutBtn").disabled = false;
+                document.getElementById("wyh_cancelTimeoutBtn").disabled = true;
+                if (!wyh_silent) { wyh_logTimeout("已调用 clearTimeout 取消定时器"); }
+            }
+        }
+
+        // ===================== 二、setInterval 周期性定时器 =====================
+        var wyh_intervalId = null;
+        var wyh_count = 0;
+        var wyh_intervalMs = 1000;
+
+        function wyh_logInterval(wyh_msg) {
+            var wyh_log = document.getElementById("wyh_intervalLog");
+            var wyh_time = new Date().toLocaleTimeString();
+            wyh_log.innerHTML += "<div>[" + wyh_time + "] " + wyh_msg + "</div>";
+            wyh_log.scrollTop = wyh_log.scrollHeight;
+        }
+
+        function wyh_startInterval() {
+            if (wyh_intervalId !== null) { return; }   // 已在运行
+            wyh_intervalMs = Number(document.getElementById("wyh_intervalInput").value) || 1000;
+
+            document.getElementById("wyh_startIntervalBtn").disabled = true;
+            document.getElementById("wyh_stopIntervalBtn").disabled = false;
+            wyh_logInterval("setInterval 已启动，间隔 " + wyh_intervalMs + " 毫秒");
+
+            // 核心：setInterval 每隔指定时间重复执行
+            wyh_intervalId = setInterval(function () {
+                wyh_count++;
+                document.getElementById("wyh_intervalNum").innerHTML = wyh_count;
+                document.getElementById("wyh_intervalState").innerHTML =
+                    "已执行 <b>" + wyh_count + "</b> 次，运行中：是";
+                document.getElementById("wyh_intervalBar").style.width =
+                    (wyh_count % 10) * 10 + "%";
+                wyh_logInterval("第 " + wyh_count + " 次执行");
+                console.log("setInterval 第 " + wyh_count + " 次执行");
+            }, wyh_intervalMs);
+        }
+
+        function wyh_stopInterval() {
+            if (wyh_intervalId !== null) {
+                clearInterval(wyh_intervalId);        // 清除周期性定时器
+                wyh_intervalId = null;
+                document.getElementById("wyh_startIntervalBtn").disabled = false;
+                document.getElementById("wyh_stopIntervalBtn").disabled = true;
+                document.getElementById("wyh_intervalState").innerHTML =
+                    "已执行 <b>" + wyh_count + "</b> 次，运行中：否（已 clearInterval）";
+                wyh_logInterval("已调用 clearInterval 停止定时器");
+            }
+        }
+
+        function wyh_resetInterval() {
+            wyh_stopInterval();
+            wyh_count = 0;
+            document.getElementById("wyh_intervalNum").innerHTML = "0";
+            document.getElementById("wyh_intervalBar").style.width = "0%";
+            document.getElementById("wyh_intervalState").innerHTML = "已执行 <b>0</b> 次，运行中：否";
+            document.getElementById("wyh_intervalLog").innerHTML = "<div>计数器已重置…</div>";
+        }
+
+        // 页面卸载时清理定时器，避免内存泄漏
+        window.addEventListener("beforeunload", function () {
+            clearTimeout(wyh_timeoutId);
+            clearInterval(wyh_tickId);
+            clearInterval(wyh_intervalId);
+        });
+    </script>
+</body>
+</html>

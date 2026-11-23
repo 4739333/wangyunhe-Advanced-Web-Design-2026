@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-02 功能：fetch根据ID获取商品详情并展示（多图切换+内置数据兜底） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品详情 - fetch</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            color: #e8ebf7;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            padding: 48px 20px 70px;
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+        .wyh_container { max-width: 900px; margin: 0 auto; }
+
+        /* ---------- 返回链接 ---------- */
+        .wyh_back {
+            display: inline-block; margin-bottom: 14px; color: #93a0c8;
+            text-decoration: none; font-size: 14px; letter-spacing: 1px; transition: color .2s;
+        }
+        .wyh_back:hover { color: #7ab8ff; }
+        .wyh_back_ml { margin-left: 14px; }
+
+        /* ---------- 标题区 ---------- */
+        .wyh_title {
+            text-align: center; font-size: 30px; letter-spacing: 3px; margin-bottom: 10px;
+            background: linear-gradient(90deg, #7ab8ff, #b48cff, #63e6be);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .wyh_subtitle { text-align: center; color: #93a0c8; font-size: 14px; letter-spacing: 1px; margin-bottom: 18px; }
+        .wyh_subtitle b { color: #7ab8ff; font-weight: 600; }
+
+        /* ---------- 数据来源徽章 ---------- */
+        .wyh_source {
+            display: inline-block; font-size: 12px; color: #63e6be;
+            background: rgba(99,230,190,.12); border: 1px solid rgba(99,230,190,.35);
+            border-radius: 999px; padding: 4px 14px; margin-bottom: 16px;
+        }
+        .wyh_source_warn { color: #ffb26b; background: rgba(255,178,107,.12); border-color: rgba(255,178,107,.35); }
+
+        /* ---------- 详情面板 ---------- */
+        .wyh_detail {
+            background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 14px; padding: 30px; display: flex; gap: 30px;
+        }
+        .wyh_detail_img { width: 340px; flex-shrink: 0; text-align: center; }
+        .wyh_main_pic {
+            height: 300px; display: flex; align-items: center; justify-content: center;
+            font-size: 120px; background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.1); border-radius: 12px;
+        }
+        .wyh_main_pic img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .wyh_thumbs { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+        .wyh_thumbs img, .wyh_thumbs span {
+            width: 56px; height: 56px; object-fit: cover; display: flex; align-items: center; justify-content: center;
+            font-size: 26px; border: 2px solid rgba(255,255,255,.15); border-radius: 8px;
+            cursor: pointer; padding: 4px; background: rgba(255,255,255,.06);
+            transition: border-color .2s, transform .2s;
+        }
+        .wyh_thumbs img:hover, .wyh_thumbs span:hover { border-color: #7ab8ff; transform: translateY(-3px); }
+        .wyh_detail_info { flex: 1; min-width: 0; }
+        .wyh_detail_info h1 { font-size: 24px; color: #e8ebf7; line-height: 1.5; margin-bottom: 10px; }
+        .wyh_detail_price { font-size: 28px; color: #ffb26b; font-weight: 900; margin: 14px 0; }
+        .wyh_detail_price small { font-size: 13px; color: #93a0c8; font-weight: 400; margin-left: 10px; }
+        .wyh_detail_desc { font-size: 14px; color: #b9c3e2; line-height: 1.9; margin-bottom: 16px; }
+        .wyh_meta { font-size: 14px; line-height: 2.3; color: #c9d6ff; }
+        .wyh_meta b { color: #e8ebf7; }
+        .wyh_tag {
+            display: inline-block; font-size: 12px; color: #7ab8ff;
+            background: rgba(122,184,255,.12); border-radius: 999px; padding: 2px 10px; margin-right: 6px;
+        }
+        .wyh_rating { color: #ffd479; }
+        .wyh_stock { color: #63e6be; font-weight: 700; }
+        .wyh_loading { text-align: center; color: #93a0c8; padding: 80px 0; font-size: 15px; width: 100%; }
+        .wyh_error { color: #ff7b72; }
+        .wyh_tip { text-align: center; color: #93a0c8; font-size: 13px; margin-top: 22px; }
+        .wyh_tip b { color: #7ab8ff; font-weight: 600; }
+
+        /* ---------- 页脚 ---------- */
+        .wyh_foot { text-align: center; color: #6f7ba0; font-size: 12.5px; margin-top: 34px; letter-spacing: 1px; }
+
+        /* ---------- 小屏适配 ---------- */
+        @media (max-width: 760px) {
+            .wyh_detail { flex-direction: column; }
+            .wyh_detail_img { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wyh_container">
+        <a href="17-3.html" class="wyh_back">← 返回商品列表</a>
+        <a href="index.html" class="wyh_back wyh_back_ml">← 返回首页</a>
+        <h1 class="wyh_title">商品详情 · fetch</h1>
+        <p class="wyh_subtitle">王云鹤 —— 根据 URL 参数 <b>id</b> 获取商品详情，支持多图缩略切换与折扣计算</p>
+
+        <span class="wyh_source" id="wyh_source">数据来源：加载中…</span>
+
+        <div class="wyh_detail" id="wyh_detail">
+            <div class="wyh_loading">正在通过 fetch 加载商品详情……</div>
+        </div>
+        <p class="wyh_tip">提示：详情数据按 URL 参数 <b>?id=商品ID</b> 请求，点击缩略图可切换主图</p>
+    </div>
+
+    <p class="wyh_foot">王云鹤 · 24002060416 · 计算机24006 · 高级网页设计 17-3-detail ｜ 点击缩略图可切换主图</p>
+
+    <script>
+        // ===== 从 URL 中取出商品 id：17-3-detail.html?id=1 =====
+        var wyh_params = new URLSearchParams(location.search);
+        var wyh_id = wyh_params.get("id");
+        if (!wyh_id) { wyh_id = "1"; }   // 没有传 id 时默认显示 1 号商品
+
+        // 首选详情接口：FakeStoreAPI（在线），失败时使用 JS 内置数据兜底
+        var wyh_api = { name: "FakeStoreAPI 接口（在线）", url: "https://fakestoreapi.com/products/" + wyh_id };
+        var wyh_localName = "本地内置数据（在线接口不可用）";
+
+        // 内置兜底数据：与列表页 17-3.html 保持同样的结构与商品
+        var wyh_products = [
+            { id: 1, title: "无线蓝牙降噪耳机", price: 299, category: "数码影音", rating: 4.7, image: "", emoji: "🎧",
+              description: "主动降噪、40 小时超长续航，佩戴轻若无物，通勤与学习两相宜。",
+              stock: 128, discount: 15, tags: ["蓝牙5.3", "主动降噪", "长续航"], images: ["🎧", "🎵", "📦"] },
+            { id: 2, title: "87键机械键盘", price: 459, category: "电脑外设", rating: 4.8, image: "", emoji: "⌨️",
+              description: "热插拔轴体、RGB 背光，敲击手感清脆利落，写代码打游戏都得劲。",
+              stock: 86, discount: 10, tags: ["热插拔", "RGB背光", "全键无冲"], images: ["⌨️", "💡", "📦"] },
+            { id: 3, title: "智能运动手表", price: 699, category: "智能穿戴", rating: 4.6, image: "", emoji: "⌚",
+              description: "心率血氧全天监测，百余种运动模式，14 天续航告别每日一充。",
+              stock: 64, discount: 12, tags: ["心率监测", "运动模式", "14天续航"], images: ["⌚", "🏃", "📦"] },
+            { id: 4, title: "便携蓝牙音箱", price: 199, category: "数码影音", rating: 4.5, image: "", emoji: "🔊",
+              description: "360° 环绕立体声，IPX7 防水，口袋大小却能撑起整个宿舍的气氛。",
+              stock: 210, discount: 20, tags: ["360°音效", "IPX7防水", "便携"], images: ["🔊", "🎶", "📦"] },
+            { id: 5, title: "无线电竞鼠标", price: 159, category: "电脑外设", rating: 4.4, image: "", emoji: "🖱️",
+              description: "26000 DPI 电竞级传感器，58g 轻量化机身，指哪打哪快人一步。",
+              stock: 156, discount: 8, tags: ["轻量化", "高DPI", "双模连接"], images: ["🖱️", "⚡", "📦"] },
+            { id: 6, title: "笔记本电脑支架", price: 89, category: "电脑外设", rating: 4.3, image: "", emoji: "💻",
+              description: "铝合金折叠升降设计，护颈护腕，让图书馆自习的颈椎舒服一点。",
+              stock: 300, discount: 0, tags: ["铝合金", "可折叠", "护颈"], images: ["💻", "🛠️", "📦"] },
+            { id: 7, title: "手工陶瓷马克杯", price: 39, category: "生活家居", rating: 4.8, image: "", emoji: "🍵",
+              description: "哑光釉面温润如玉，450ml 大容量，装得下咖啡也装得下下午的困意。",
+              stock: 520, discount: 0, tags: ["陶瓷", "大容量", "微波炉可用"], images: ["🍵", "☕", "📦"] },
+            { id: 8, title: "简约帆布托特包", price: 69, category: "时尚穿搭", rating: 4.6, image: "", emoji: "🎒",
+              description: "加厚帆布耐磨能装，课本电脑一包带走，通勤上课都百搭。",
+              stock: 410, discount: 5, tags: ["加厚帆布", "大容量", "百搭"], images: ["🎒", "👕", "📦"] }
+        ];
+
+        // 带超时的 fetch：避免接口无响应时页面一直等
+        function wyh_fetchJson(wyh_url, wyh_ms) {
+            var wyh_controller = new AbortController();
+            var wyh_timer = setTimeout(function () { wyh_controller.abort(); }, wyh_ms);
+            return fetch(wyh_url, { signal: wyh_controller.signal })
+                .then(function (wyh_res) {
+                    if (!wyh_res.ok) { throw new Error("HTTP " + wyh_res.status); }
+                    return wyh_res.json();
+                })
+                .finally(function () { clearTimeout(wyh_timer); });
+        }
+
+        // 统一在线接口返回的字段结构
+        function wyh_normalizeDetail(wyh_data) {
+            if (!wyh_data || !wyh_data.title) { throw new Error("返回数据无商品信息"); }
+            return {
+                title: wyh_data.title,
+                price: wyh_data.price,
+                description: wyh_data.description,
+                brand: wyh_data.brand || wyh_data.category || "未分类",
+                category: wyh_data.category || "未分类",
+                rating: typeof wyh_data.rating === "object" && wyh_data.rating !== null ? wyh_data.rating.rate : wyh_data.rating,
+                stock: wyh_data.stock || "—",
+                discount: wyh_data.discountPercentage || 0,
+                tags: wyh_data.tags || [],
+                images: wyh_data.images || [],
+                thumbnail: wyh_data.thumbnail || wyh_data.image || "",
+                emoji: wyh_data.emoji || "📦"
+            };
+        }
+
+        // 内置数据兜底：从 wyh_products 数组按 URL 参数 id 查找
+        function wyh_findLocal() {
+            var wyh_found = null;
+            for (var wyh_i = 0; wyh_i < wyh_products.length; wyh_i++) {
+                if (String(wyh_products[wyh_i].id) === String(wyh_id)) {
+                    wyh_found = wyh_products[wyh_i];
+                    break;
+                }
+            }
+            if (!wyh_found) { wyh_found = wyh_products[0]; }   // 找不到时显示第一个商品
+            return {
+                title: wyh_found.title,
+                price: wyh_found.price,
+                description: wyh_found.description,
+                brand: wyh_found.category,
+                category: wyh_found.category,
+                rating: wyh_found.rating,
+                stock: wyh_found.stock,
+                discount: wyh_found.discount,
+                tags: wyh_found.tags,
+                images: wyh_found.images,
+                thumbnail: wyh_found.image,
+                emoji: wyh_found.emoji
+            };
+        }
+
+        // 渲染详情
+        function wyh_renderDetail(wyh_p, wyh_sourceName) {
+            // 缩略图：有真实图片用 img，内置数据用 emoji 缩略块
+            var wyh_thumbs = "";
+            for (var wyh_i = 0; wyh_i < wyh_p.images.length; wyh_i++) {
+                if (wyh_p.thumbnail) {
+                    wyh_thumbs += '<img src="' + wyh_p.images[wyh_i] + '" alt="缩略图" onclick="wyh_changeImg(this.src)">';
+                } else {
+                    wyh_thumbs += '<span onclick="wyh_changeEmoji(this.textContent)">' + wyh_p.images[wyh_i] + '</span>';
+                }
+            }
+            // 标签
+            var wyh_tags = "";
+            for (var wyh_j = 0; wyh_j < wyh_p.tags.length; wyh_j++) {
+                wyh_tags += '<span class="wyh_tag">' + wyh_p.tags[wyh_j] + '</span>';
+            }
+            if (!wyh_tags) { wyh_tags = '<span class="wyh_tag">暂无标签</span>'; }
+
+            // 主图：有网络图片用图片，内置数据用 emoji
+            var wyh_mainPic = wyh_p.thumbnail
+                ? '<img id="wyh_mainImg" src="' + wyh_p.thumbnail + '" alt="' + wyh_p.title + '">'
+                : '<span id="wyh_mainEmoji">' + wyh_p.emoji + '</span>';
+
+            // 原价 = 现价 / (1 - 折扣)
+            var wyh_oldPrice = wyh_p.discount > 0
+                ? (wyh_p.price / (1 - wyh_p.discount / 100)).toFixed(2)
+                : "";
+
+            document.getElementById("wyh_detail").innerHTML =
+                '<div class="wyh_detail_img">' +
+                    '<div class="wyh_main_pic">' + wyh_mainPic + '</div>' +
+                    '<div class="wyh_thumbs">' + wyh_thumbs + '</div>' +
+                '</div>' +
+                '<div class="wyh_detail_info">' +
+                    '<h1>' + wyh_p.title + '</h1>' +
+                    '<div class="wyh_detail_price">¥' + wyh_p.price +
+                        (wyh_oldPrice ? '<small>原价 ¥' + wyh_oldPrice + '（优惠 ' + wyh_p.discount + '%）</small>' : '') +
+                    '</div>' +
+                    '<div class="wyh_detail_desc">' + wyh_p.description + '</div>' +
+                    '<div class="wyh_meta">' +
+                        '品牌：<b>' + wyh_p.brand + '</b>　类别：<b>' + wyh_p.category + '</b><br>' +
+                        '评分：<span class="wyh_rating">★ ' + wyh_p.rating + '</span>　' +
+                        '库存：<span class="wyh_stock">剩余 ' + wyh_p.stock + ' 件</span><br>' +
+                        '标签：' + wyh_tags +
+                    '</div>' +
+                '</div>';
+
+            var wyh_badge = document.getElementById("wyh_source");
+            wyh_badge.innerHTML = "数据来源：" + wyh_sourceName;
+            wyh_badge.className = "wyh_source" + (wyh_sourceName === wyh_localName ? " wyh_source_warn" : "");
+            document.title = wyh_p.title + " - 商品详情";
+            console.log("成功渲染商品详情，来源：" + wyh_sourceName);
+        }
+
+        // ===== 只发一个请求：FakeStoreAPI，3 秒超时，失败直接用内置数据 =====
+        function wyh_loadDetail() {
+            wyh_fetchJson(wyh_api.url, 3000)
+                .then(function (wyh_data) {
+                    console.log("详情接口请求成功：" + wyh_api.url, wyh_data);
+                    wyh_renderDetail(wyh_normalizeDetail(wyh_data), wyh_api.name);
+                })
+                .catch(function (wyh_err) {
+                    // 在线接口失败：立即使用 JS 内置数据兜底
+                    console.log("在线详情接口失败：" + wyh_err.message + "，改用 JS 内置数据兜底");
+                    wyh_renderDetail(wyh_findLocal(), wyh_localName);
+                });
+        }
+
+        // 点击真实图片缩略图切换主图
+        function wyh_changeImg(wyh_src) {
+            document.getElementById("wyh_mainImg").src = wyh_src;
+        }
+
+        // 点击 emoji 缩略块切换主图（内置数据版）
+        function wyh_changeEmoji(wyh_ch) {
+            document.getElementById("wyh_mainEmoji").textContent = wyh_ch;
+        }
+
+        // 开始请求
+        wyh_loadDetail();
+    </script>
+</body>
+</html>

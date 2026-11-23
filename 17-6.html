@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-02 功能：包饺子异步流程演示（Promise与async/await） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>包饺子 · 异步流程</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            color: #e8ebf7; padding: 48px 20px 70px; min-height: 100vh; line-height: 1.7;
+        }
+        .wyh_back {
+            display: inline-block; margin-bottom: 14px; color: #93a0c8;
+            text-decoration: none; font-size: 14px;
+        }
+        .wyh_back:hover { color: #7ab8ff; }
+        .wyh_container { max-width: 1180px; margin: 0 auto; }
+
+        /* ===== 标题 ===== */
+        .wyh_title {
+            text-align: center; font-size: 34px; font-weight: 700; letter-spacing: 3px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #7ab8ff, #b48cff, #63e6be);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .wyh_subtitle {
+            text-align: center; font-size: 13.5px; color: #93a0c8; line-height: 1.9;
+            margin-bottom: 26px; max-width: 1000px; margin-left: auto; margin-right: auto;
+        }
+        .wyh_subtitle b { color: #b48cff; }
+
+        /* ===== 步骤卡片 ===== */
+        .wyh_steps {
+            display: flex; align-items: stretch; flex-wrap: wrap; gap: 8px; margin-bottom: 26px;
+        }
+        .wyh_step {
+            flex: 1; min-width: 150px;
+            background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 12px; padding: 12px 12px 14px;
+        }
+        .wyh_step_no {
+            display: inline-block; background: linear-gradient(90deg, #4f7dff, #b48cff); color: #fff;
+            font-size: 10.5px; letter-spacing: .5px; padding: 2px 8px; margin-bottom: 8px; border-radius: 4px;
+        }
+        .wyh_step h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: #e8ebf7; }
+        .wyh_step_sub { font-size: 11.5px; color: #93a0c8; min-height: 30px; line-height: 1.5; }
+        .wyh_bar {
+            height: 9px; background: rgba(255,255,255,.08); border-radius: 5px; overflow: hidden; margin: 6px 0 8px;
+        }
+        .wyh_bar_fill {
+            height: 100%; width: 0%; background: linear-gradient(90deg, #4f7dff, #7ab8ff); border-radius: 5px;
+        }
+        .wyh_done {
+            font-size: 11.5px; color: #63e6be; font-weight: 700;
+            opacity: 0; transform: translateY(3px); transition: all .3s;
+        }
+        .wyh_done.wyh_show { opacity: 1; transform: translateY(0); }
+        .wyh_checks { margin-top: 8px; }
+        .wyh_check {
+            font-size: 11px; color: #93a0c8; background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.14); border-radius: 6px; padding: 3px 6px;
+            margin-bottom: 4px; transition: all .3s;
+        }
+        .wyh_check.wyh_check_ok {
+            color: #63e6be; background: rgba(99,230,190,.1); border-color: rgba(99,230,190,.4);
+        }
+        .wyh_arrow {
+            align-self: center; color: #6f7ba0; font-size: 18px; padding: 0 2px; flex-shrink: 0;
+        }
+
+        /* ===== 控制面板 + 日志 ===== */
+        .wyh_bottom { display: flex; flex-wrap: wrap; gap: 18px; }
+        .wyh_panel {
+            background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 14px; padding: 16px 18px;
+        }
+        .wyh_panel_control { flex: 0 0 52%; }
+        .wyh_panel_log { flex: 1; min-width: 300px; }
+        .wyh_panel h2 { font-size: 20px; font-weight: 700; color: #7ab8ff; margin-bottom: 14px; letter-spacing: 1px; }
+        .wyh_ctrl_row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+        .wyh_ctrl_label { font-size: 14px; font-weight: 700; color: #e8ebf7; }
+        .wyh_status_badge {
+            font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 8px;
+            background: rgba(255,255,255,.08); color: #93a0c8; transition: all .3s;
+        }
+        .wyh_status_badge.wyh_status_run { background: rgba(255,212,121,.15); color: #ffd479; border: 1px solid rgba(255,212,121,.4); }
+        .wyh_status_badge.wyh_status_done { background: linear-gradient(90deg, #2fbf71, #63e6be); color: #10142b; }
+        .wyh_start_btn {
+            width: 100%; padding: 18px 0; font-size: 19px; font-weight: 700;
+            background: linear-gradient(90deg, #ffd479, #f7a94a); border: none; border-radius: 10px;
+            cursor: pointer; color: #1c1c28; letter-spacing: 1px;
+            box-shadow: 0 2px 0 rgba(0,0,0,.35);
+            transition: transform .15s, box-shadow .15s;
+        }
+        .wyh_start_btn:hover { transform: translateY(-1px); box-shadow: 0 3px 0 rgba(0,0,0,.35); }
+        .wyh_start_btn:disabled { background: #3b4468; color: #93a0c8; box-shadow: none; cursor: not-allowed; }
+        .wyh_speed_btns { display: flex; gap: 0; margin-left: auto; }
+        .wyh_speed_btn {
+            font-size: 12px; padding: 4px 10px; border: 1px solid rgba(255,255,255,.25);
+            background: transparent; cursor: pointer; color: #93a0c8;
+        }
+        .wyh_speed_btn:first-child { border-radius: 8px 0 0 8px; }
+        .wyh_speed_btn:last-child { border-radius: 0 8px 8px 0; }
+        .wyh_speed_btn.wyh_speed_active {
+            background: linear-gradient(90deg, #4f7dff, #7ab8ff); color: #fff; border-color: transparent;
+        }
+        .wyh_reset_btn {
+            font-size: 12px; padding: 4px 12px; border: 1px solid rgba(255,255,255,.25);
+            background: transparent; border-radius: 8px; cursor: pointer; color: #93a0c8;
+        }
+        .wyh_reset_btn:hover { border-color: #ff8a8a; color: #ff8a8a; }
+
+        .wyh_code {
+            margin-top: 16px; background: #0d1126; border: 1px solid rgba(255,255,255,.08);
+            color: #c9d6ff; border-radius: 10px; padding: 12px 14px; font-family: Consolas, monospace;
+            font-size: 12.5px; line-height: 1.85; white-space: pre; overflow-x: auto;
+        }
+        .wyh_code .wyh_kw { color: #b48cff; }
+        .wyh_code .wyh_fn { color: #63e6be; }
+        .wyh_code .wyh_cm { color: #6f7ba0; }
+
+        .wyh_log {
+            background: #0d1126; border: 1px solid rgba(255,255,255,.08); border-radius: 10px;
+            padding: 12px 14px; height: 245px; overflow-y: auto;
+            font-family: Consolas, monospace; font-size: 12.5px; line-height: 1.9;
+        }
+        .wyh_log_line { color: #c9d6ff; }
+        .wyh_log_line .wyh_time { color: #6f7ba0; }
+        .wyh_log_ok { color: #63e6be; }
+        .wyh_log_race { color: #7ab8ff; }
+        .wyh_log_warn { color: #ffd479; }
+        .wyh_log_done { color: #b48cff; }
+
+        .wyh_foot { text-align: center; color: #6f7ba0; font-size: 12.5px; margin-top: 26px; }
+    </style>
+</head>
+<body>
+<a href="index.html" class="wyh_back">← 返回首页</a>
+<div class="wyh_container">
+    <h1 class="wyh_title">包饺子 · 异步流程</h1>
+    <p class="wyh_subtitle">
+        王云鹤 —— 使用 <b>Promise</b> 与 <b>async/await</b> 演示：买原料（线上 / 线下同时进行，任一完成即继续 → <b>Promise.race</b>）
+        → 取原料 → 和面与和馅同时进行，都完成才继续 → <b>Promise.all</b> → 包饺子 → 煮饺子 → 吃饺子。
+        每个流程用 setTimeout 模拟耗时。
+    </p>
+
+    <!-- 六个步骤 -->
+    <div class="wyh_steps">
+        <div class="wyh_step" id="wyh_step1">
+            <div class="wyh_step_no">STEP 1</div>
+            <h3>买原料</h3>
+            <div class="wyh_step_sub">线上 6s / 线下 3s</div>
+            <div class="wyh_bar"><div class="wyh_bar_fill" id="wyh_bar1"></div></div>
+            <div class="wyh_done" id="wyh_done1">✓ 完成</div>
+            <div class="wyh_checks">
+                <div class="wyh_check" id="wyh_chk1a">线上购买（6s）</div>
+                <div class="wyh_check" id="wyh_chk1b">线下购买（3s）</div>
+            </div>
+        </div>
+        <span class="wyh_arrow">→</span>
+
+        <div class="wyh_step" id="wyh_step2">
+            <div class="wyh_step_no">STEP 2</div>
+            <h3>取原料</h3>
+            <div class="wyh_step_sub">2s</div>
+            <div class="wyh_bar"><div class="wyh_bar_fill" id="wyh_bar2"></div></div>
+            <div class="wyh_done" id="wyh_done2">✓ 完成</div>
+        </div>
+        <span class="wyh_arrow">→</span>
+
+        <div class="wyh_step" id="wyh_step3">
+            <div class="wyh_step_no">STEP 3</div>
+            <h3>和面和馅</h3>
+            <div class="wyh_step_sub">和面 4s / 和馅 3s</div>
+            <div class="wyh_bar"><div class="wyh_bar_fill" id="wyh_bar3"></div></div>
+            <div class="wyh_done" id="wyh_done3">✓ 完成</div>
+            <div class="wyh_checks">
+                <div class="wyh_check" id="wyh_chk3a">和面（4s）</div>
+                <div class="wyh_check" id="wyh_chk3b">和馅（3s）</div>
+            </div>
+        </div>
+        <span class="wyh_arrow">→</span>
+
+        <div class="wyh_step" id="wyh_step4">
+            <div class="wyh_step_no">STEP 4</div>
+            <h3>包饺子</h3>
+            <div class="wyh_step_sub">5s</div>
+            <div class="wyh_bar"><div class="wyh_bar_fill" id="wyh_bar4"></div></div>
+            <div class="wyh_done" id="wyh_done4">✓ 完成</div>
+        </div>
+        <span class="wyh_arrow">→</span>
+
+        <div class="wyh_step" id="wyh_step5">
+            <div class="wyh_step_no">STEP 5</div>
+            <h3>煮饺子</h3>
+            <div class="wyh_step_sub">4s</div>
+            <div class="wyh_bar"><div class="wyh_bar_fill" id="wyh_bar5"></div></div>
+            <div class="wyh_done" id="wyh_done5">✓ 完成</div>
+        </div>
+        <span class="wyh_arrow">→</span>
+
+        <div class="wyh_step" id="wyh_step6">
+            <div class="wyh_step_no">STEP 6</div>
+            <h3>吃饺子</h3>
+            <div class="wyh_step_sub">3s</div>
+            <div class="wyh_bar"><div class="wyh_bar_fill" id="wyh_bar6"></div></div>
+            <div class="wyh_done" id="wyh_done6">✓ 完成</div>
+        </div>
+    </div>
+
+    <!-- 控制面板 + 日志 -->
+    <div class="wyh_bottom">
+        <div class="wyh_panel wyh_panel_control">
+            <h2>演示控制</h2>
+            <div class="wyh_ctrl_row">
+                <span class="wyh_ctrl_label">状态：</span>
+                <span class="wyh_status_badge" id="wyh_status">准备中</span>
+                <div class="wyh_speed_btns">
+                    <button class="wyh_speed_btn wyh_speed_active" onclick="wyh_setSpeed(1, this)">×1</button>
+                    <button class="wyh_speed_btn" onclick="wyh_setSpeed(2, this)">×2</button>
+                    <button class="wyh_speed_btn" onclick="wyh_setSpeed(4, this)">×4</button>
+                </div>
+                <button class="wyh_reset_btn" onclick="wyh_reset()">重置</button>
+            </div>
+
+            <button class="wyh_start_btn" id="wyh_startBtn" onclick="wyh_start()">▶ 开始包饺子</button>
+
+            <div class="wyh_code"><span class="wyh_cm">// 核心逻辑（节选）</span>
+<span class="wyh_kw">async function</span> <span class="wyh_fn">wyh_main</span>() {
+    <span class="wyh_cm">// 1. 线上 / 线下同时买，任一完成即可</span>
+    <span class="wyh_kw">await</span> Promise.race([wyh_buyOnline(), wyh_buyOffline()]);
+    <span class="wyh_kw">await</span> wyh_fetchMaterial();          <span class="wyh_cm">// 2. 取原料 2s</span>
+    <span class="wyh_cm">// 3. 和面与和馅都要完成</span>
+    <span class="wyh_kw">await</span> Promise.all([wyh_knead(), wyh_filling()]);
+    <span class="wyh_kw">await</span> wyh_wrap();                    <span class="wyh_cm">// 4. 包饺子 5s</span>
+    <span class="wyh_kw">await</span> wyh_boil();                    <span class="wyh_cm">// 5. 煮饺子 4s</span>
+    <span class="wyh_kw">await</span> wyh_eat();                     <span class="wyh_cm">// 6. 吃饺子 3s</span>
+}</div>
+        </div>
+
+        <div class="wyh_panel wyh_panel_log">
+            <h2>运行日志</h2>
+            <div class="wyh_log" id="wyh_log"><div class="wyh_log_line">等待开始……</div></div>
+        </div>
+    </div>
+</div>
+
+<p class="wyh_foot">王云鹤 · 24002060416 · 计算机24006 · 高级网页设计 17-6 ｜ Promise.race 任一完成即继续，Promise.all 全部完成才继续</p>
+
+<script>
+    // ===================== 状态变量 =====================
+    var wyh_speed = 1;        // 倍速
+    var wyh_running = false;  // 是否正在运行
+    var wyh_runId = 0;        // 运行标识，用于作废旧的回调
+
+    // 时间戳 HH:MM:SS
+    function wyh_ts() {
+        var wyh_d = new Date();
+        function wyh_pad(wyh_n) { return wyh_n < 10 ? "0" + wyh_n : "" + wyh_n; }
+        return wyh_pad(wyh_d.getHours()) + ":" + wyh_pad(wyh_d.getMinutes()) + ":" + wyh_pad(wyh_d.getSeconds());
+    }
+
+    // 写日志
+    function wyh_log(wyh_msg, wyh_cls) {
+        var wyh_logBox = document.getElementById("wyh_log");
+        var wyh_time = wyh_ts();
+        wyh_logBox.innerHTML += '<div class="wyh_log_line"><span class="wyh_time">[' + wyh_time + ']</span> ' +
+            '<span class="' + (wyh_cls ? "wyh_log_" + wyh_cls : "") + '">' + wyh_msg + '</span></div>';
+        wyh_logBox.scrollTop = wyh_logBox.scrollHeight;
+    }
+
+    // 核心：用 setTimeout 模拟耗时任务，返回 Promise
+    function wyh_wait(wyh_ms) {
+        return new Promise(function (wyh_resolve) {
+            setTimeout(wyh_resolve, wyh_ms / wyh_speed);
+        });
+    }
+
+    // 进度条动画
+    function wyh_fill(wyh_step, wyh_ms) {
+        var wyh_bar = document.getElementById("wyh_bar" + wyh_step);
+        wyh_bar.style.transition = "width " + (wyh_ms / wyh_speed) + "ms linear";
+        wyh_bar.style.width = "0%";
+        // 触发重绘后再设置宽度，保证过渡动画生效
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () { wyh_bar.style.width = "100%"; });
+        });
+    }
+
+    // 标记步骤完成
+    function wyh_markDone(wyh_step) {
+        document.getElementById("wyh_done" + wyh_step).classList.add("wyh_show");
+    }
+
+    // 标记子任务完成
+    function wyh_check(wyh_id, wyh_text) {
+        var wyh_el = document.getElementById(wyh_id);
+        wyh_el.innerHTML = "✓ " + wyh_text;
+        wyh_el.classList.add("wyh_check_ok");
+    }
+
+    // 修改状态徽标
+    function wyh_setStatus(wyh_text, wyh_cls) {
+        var wyh_badge = document.getElementById("wyh_status");
+        wyh_badge.innerHTML = wyh_text;
+        wyh_badge.className = "wyh_status_badge" + (wyh_cls ? " wyh_status_" + wyh_cls : "");
+    }
+
+    // ===================== 各个异步任务（都返回 Promise） =====================
+    function wyh_buyOnline(wyh_myRun) {
+        return wyh_wait(6000).then(function () {
+            if (wyh_myRun !== wyh_runId) { return; }
+            wyh_check("wyh_chk1a", "线上购买（6s）");
+            wyh_log("线上购买送达 ✓（6s）", "ok");
+        });
+    }
+
+    function wyh_buyOffline(wyh_myRun) {
+        return wyh_wait(3000).then(function () {
+            if (wyh_myRun !== wyh_runId) { return; }
+            wyh_check("wyh_chk1b", "线下购买（3s）");
+            wyh_log("线下购买完成 ✓（3s）", "ok");
+        });
+    }
+
+    function wyh_knead(wyh_myRun) {
+        wyh_log("开始和面…（4s）");
+        return wyh_wait(4000).then(function () {
+            if (wyh_myRun !== wyh_runId) { return; }
+            wyh_check("wyh_chk3a", "和面（4s）");
+            wyh_log("和面完成 ✓（4s）", "ok");
+        });
+    }
+
+    function wyh_filling(wyh_myRun) {
+        wyh_log("开始和馅…（3s）");
+        return wyh_wait(3000).then(function () {
+            if (wyh_myRun !== wyh_runId) { return; }
+            wyh_check("wyh_chk3b", "和馅（3s）");
+            wyh_log("和馅完成 ✓（3s）", "ok");
+        });
+    }
+
+    // ===================== 主流程：async / await =====================
+    async function wyh_main() {
+        var wyh_myRun = wyh_runId;
+
+        // 1. 买原料：线上 6s 与线下 3s 同时进行，任一完成即继续（Promise.race）
+        wyh_fill(1, 3000);
+        wyh_log("买原料开始：线上（6s）与线下（3s）同时进行", "warn");
+        await Promise.race([wyh_buyOnline(wyh_myRun), wyh_buyOffline(wyh_myRun)]);
+        if (wyh_myRun !== wyh_runId) { return; }
+        wyh_markDone(1);
+        wyh_log("买原料结束：[线下]先完成，可进行下一步（Promise.race 生效）", "race");
+
+        // 2. 取原料 2s
+        wyh_fill(2, 2000);
+        await wyh_wait(2000);
+        if (wyh_myRun !== wyh_runId) { return; }
+        wyh_markDone(2);
+        wyh_log("取原料 ✓ 完成（2s）", "ok");
+
+        // 3. 和面与和馅同时进行，都完成才继续（Promise.all）
+        wyh_fill(3, 4000);
+        wyh_log("和面与和馅同时进行（Promise.all）…", "warn");
+        await Promise.all([wyh_knead(wyh_myRun), wyh_filling(wyh_myRun)]);
+        if (wyh_myRun !== wyh_runId) { return; }
+        wyh_markDone(3);
+        wyh_log("和面与和馅都完成，继续下一步（Promise.all 生效）", "race");
+
+        // 4. 包饺子 5s
+        wyh_fill(4, 5000);
+        await wyh_wait(5000);
+        if (wyh_myRun !== wyh_runId) { return; }
+        wyh_markDone(4);
+        wyh_log("包饺子 ✓ 完成（5s）", "ok");
+
+        // 5. 煮饺子 4s
+        wyh_fill(5, 4000);
+        await wyh_wait(4000);
+        if (wyh_myRun !== wyh_runId) { return; }
+        wyh_markDone(5);
+        wyh_log("煮饺子 ✓ 完成（4s）", "ok");
+
+        // 6. 吃饺子 3s
+        wyh_fill(6, 3000);
+        await wyh_wait(3000);
+        if (wyh_myRun !== wyh_runId) { return; }
+        wyh_markDone(6);
+        wyh_log("吃饺子 ✓ 完成（3s）", "ok");
+
+        // 全部完成
+        wyh_setStatus("完成 √ 开吃!", "done");
+        wyh_log("流程结束：饺子出锅，开吃！", "done");
+        wyh_running = false;
+        document.getElementById("wyh_startBtn").disabled = false;
+        document.getElementById("wyh_startBtn").innerHTML = "▶ 开始包饺子";
+    }
+
+    // ===================== 控制 =====================
+    function wyh_start() {
+        if (wyh_running) { return; }
+        wyh_running = true;
+        wyh_runId++;              // 新一轮运行标识
+        wyh_clearVisuals();
+        document.getElementById("wyh_startBtn").disabled = true;
+        document.getElementById("wyh_startBtn").innerHTML = "异步流程执行中…";
+        wyh_setStatus("进行中…", "run");
+        wyh_log("=========== 开始包饺子（倍速 ×" + wyh_speed + "）===========", "warn");
+        wyh_main();
+    }
+
+    function wyh_setSpeed(wyh_val, wyh_btn) {
+        if (wyh_running) { return; }   // 运行中不切换，避免计时混乱
+        wyh_speed = wyh_val;
+        var wyh_btns = document.querySelectorAll(".wyh_speed_btn");
+        for (var wyh_i = 0; wyh_i < wyh_btns.length; wyh_i++) {
+            wyh_btns[wyh_i].className = "wyh_speed_btn";
+        }
+        wyh_btn.className = "wyh_speed_btn wyh_speed_active";
+    }
+
+    // 清空进度条、完成标记
+    function wyh_clearVisuals() {
+        for (var wyh_i = 1; wyh_i <= 6; wyh_i++) {
+            var wyh_bar = document.getElementById("wyh_bar" + wyh_i);
+            wyh_bar.style.transition = "none";
+            wyh_bar.style.width = "0%";
+            document.getElementById("wyh_done" + wyh_i).classList.remove("wyh_show");
+        }
+        var wyh_checks = ["wyh_chk1a", "wyh_chk1b", "wyh_chk3a", "wyh_chk3b"];
+        var wyh_texts = ["线上购买（6s）", "线下购买（3s）", "和面（4s）", "和馅（3s）"];
+        for (var wyh_j = 0; wyh_j < wyh_checks.length; wyh_j++) {
+            var wyh_el = document.getElementById(wyh_checks[wyh_j]);
+            wyh_el.className = "wyh_check";
+            wyh_el.innerHTML = wyh_texts[wyh_j];
+        }
+    }
+
+    function wyh_reset() {
+        wyh_runId++;              // 作废正在执行的回调
+        wyh_running = false;
+        wyh_clearVisuals();
+        document.getElementById("wyh_startBtn").disabled = false;
+        document.getElementById("wyh_startBtn").innerHTML = "▶ 开始包饺子";
+        wyh_setStatus("准备中", "");
+        document.getElementById("wyh_log").innerHTML = '<div class="wyh_log_line">已重置，等待开始……</div>';
+    }
+
+    // 支持通过 ?auto=1 自动演示（便于课堂展示）
+    if (location.search.indexOf("auto=1") !== -1) {
+        wyh_start();
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-02 功能：JSON 展示与 JSON.stringify/parse 互转演示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON 展示与互转演示</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(160deg, #10142b 0%, #1c2340 55%, #252c52 100%);
+            color: #e8ebf7;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            padding: 48px 20px 70px;
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        .wyh_container { max-width: 1000px; margin: 0 auto; }
+
+        /* ---------- 标题区 ---------- */
+        .wyh_title {
+            text-align: center;
+            font-size: 32px;
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, #7ab8ff, #b48cff, #63e6be);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .wyh_subtitle {
+            text-align: center;
+            color: #93a0c8;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 28px;
+        }
+
+        .wyh_subtitle b { color: #7ab8ff; font-weight: normal; }
+
+        /* ---------- 返回链接 ---------- */
+        .wyh_back-link {
+            display: inline-block;
+            margin-bottom: 16px;
+            color: #93a0c8;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .wyh_back-link:hover { color: #7ab8ff; }
+
+        /* ---------- 卡片网格 ---------- */
+        .wyh_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 18px;
+        }
+
+        .wyh_card {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 14px;
+            padding: 20px 24px;
+            backdrop-filter: blur(6px);
+        }
+
+        .wyh_card h2 { font-size: 18px; color: #e8ebf7; margin-bottom: 12px; }
+        .wyh_card p, .wyh_card li { font-size: 14px; color: #c9d2ec; }
+        .wyh_card b { color: #7ab8ff; }
+        .wyh_card ul { padding-left: 22px; margin: 6px 0; }
+
+        /* ---------- 代码展示块 ---------- */
+        .wyh_code {
+            background: #0d1126;
+            border: 1px solid rgba(255, 255, 255, .08);
+            color: #c9d6ff;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .wyh_key { color: #7ab8ff; }
+        .wyh_str { color: #63e6be; }
+        .wyh_num { color: #ffd479; }
+
+        /* ---------- 结果展示块 ---------- */
+        .wyh_result {
+            background: rgba(255, 255, 255, .04);
+            border: 1px dashed rgba(255, 255, 255, .18);
+            border-radius: 8px;
+            color: #d6def5;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.9;
+            word-break: break-all;
+        }
+
+        .wyh_result b { color: #63e6be; }
+
+        /* ---------- 按钮 ---------- */
+        .wyh_btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #4f7dff, #7ab8ff);
+            color: #fff;
+            font-size: 14px;
+            margin: 4px 10px 8px 0;
+        }
+
+        .wyh_btn:hover { filter: brightness(1.15); }
+
+        /* 次级按钮：描边样式 */
+        .wyh_btn_ghost {
+            background: transparent;
+            border: 1px solid #63e6be;
+            color: #63e6be;
+        }
+
+        .wyh_btn_ghost:hover { background: rgba(99, 230, 190, .12); filter: none; }
+
+        /* ---------- 知识点小结 ---------- */
+        .wyh_note {
+            margin-top: 22px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 212, 121, .35);
+            border-radius: 14px;
+            padding: 16px 22px;
+            font-size: 14px;
+            color: #ffd479;
+            line-height: 2;
+        }
+
+        .wyh_foot {
+            text-align: center;
+            color: #6f7ba0;
+            font-size: 12.5px;
+            margin-top: 26px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wyh_container">
+        <a href="index.html" class="wyh_back-link">← 返回首页</a>
+        <h1 class="wyh_title">JSON 展示</h1>
+        <p class="wyh_subtitle"><b>王云鹤</b> —— JSON 概念、语法规则、JSON.parse 与 JSON.stringify 互转演示</p>
+
+        <div class="wyh_grid">
+            <!-- 一、JSON 概念与语法 -->
+            <div class="wyh_card">
+                <h2>一、什么是 JSON</h2>
+                <p>JSON（JavaScript Object Notation，JS 对象简谱）是一种<b>轻量级的数据交换格式</b>，
+                   独立于语言和平台，常用于前后端数据传输。</p>
+                <ul>
+                    <li>数据由<b>键值对</b>组成，键必须用<b>双引号</b>包裹</li>
+                    <li>值可以是：字符串、数字、布尔值、null、对象、数组</li>
+                    <li>数据之间用<b>逗号</b>分隔，<b>大括号</b>保存对象，<b>方括号</b>保存数组</li>
+                    <li>不支持注释、不支持函数</li>
+                </ul>
+                <div class="wyh_code">{
+  <span class="wyh_key">"name"</span>: <span class="wyh_str">"王云鹤"</span>,
+  <span class="wyh_key">"age"</span>: <span class="wyh_num">20</span>,
+  <span class="wyh_key">"isStudent"</span>: <span class="wyh_num">true</span>,
+  <span class="wyh_key">"hobbies"</span>: [<span class="wyh_str">"网页设计"</span>, <span class="wyh_str">"篮球"</span>]
+}</div>
+            </div>
+
+            <!-- 二、JSON 数据示例 -->
+            <div class="wyh_card">
+                <h2>二、一个完整的 JSON 数据示例</h2>
+                <div class="wyh_code">{
+  <span class="wyh_key">"students"</span>: [
+    { <span class="wyh_key">"id"</span>: <span class="wyh_num">1</span>, <span class="wyh_key">"name"</span>: <span class="wyh_str">"张三"</span>, <span class="wyh_key">"score"</span>: <span class="wyh_num">92</span> },
+    { <span class="wyh_key">"id"</span>: <span class="wyh_num">2</span>, <span class="wyh_key">"name"</span>: <span class="wyh_str">"李四"</span>, <span class="wyh_key">"score"</span>: <span class="wyh_num">85</span> },
+    { <span class="wyh_key">"id"</span>: <span class="wyh_num">3</span>, <span class="wyh_key">"name"</span>: <span class="wyh_str">"王五"</span>, <span class="wyh_key">"score"</span>: <span class="wyh_num">78</span> }
+  ],
+  <span class="wyh_key">"class"</span>: <span class="wyh_str">"计算机24006"</span>,
+  <span class="wyh_key">"teacher"</span>: <span class="wyh_str">"王云鹤"</span>
+}</div>
+                <p>对象里嵌套数组，数组里又嵌套对象，这是接口返回数据最常见的结构。</p>
+            </div>
+
+            <!-- 三、stringify 交互演示 -->
+            <div class="wyh_card">
+                <h2>三、JS 对象 → JSON 字符串：JSON.stringify()</h2>
+                <div class="wyh_code"><span class="wyh_key">var</span> wyh_obj = { name: <span class="wyh_str">"王云鹤"</span>, age: <span class="wyh_num">20</span> };
+<span class="wyh_key">var</span> wyh_json = JSON.stringify(wyh_obj);</div>
+                <button class="wyh_btn" id="wyh_btnStringify" type="button">执行 stringify</button>
+                <div class="wyh_result" id="wyh_stringifyResult"></div>
+            </div>
+
+            <!-- 四、parse 交互演示 -->
+            <div class="wyh_card">
+                <h2>四、JSON 字符串 → JS 对象：JSON.parse()</h2>
+                <div class="wyh_code"><span class="wyh_key">var</span> wyh_jsonStr = <span class="wyh_str">'{"brand":"Apple","price":8999}'</span>;
+<span class="wyh_key">var</span> wyh_obj2 = JSON.parse(wyh_jsonStr);
+<span class="wyh_num">// 之后即可 wyh_obj2.brand 取值</span></div>
+                <button class="wyh_btn wyh_btn_ghost" id="wyh_btnParse" type="button">执行 parse</button>
+                <div class="wyh_result" id="wyh_parseResult"></div>
+            </div>
+        </div>
+
+        <!-- 知识点小结 -->
+        <div class="wyh_note">
+            <b>知识点小结：</b>JSON 是前后端交换数据的标准格式，接口返回的数据基本都是 JSON 字符串。
+            <b>JSON.stringify()</b> 把 JS 对象变成 JSON 字符串（发送给服务器），<b>JSON.parse()</b> 把 JSON 字符串还原成 JS 对象（接收解析）。
+            使用 fetch 时，<b>response.json()</b> 内部就是帮我们完成了 JSON.parse 的工作。
+        </div>
+
+        <p class="wyh_foot">王云鹤 · 24002060416 · 计算机24006 · 高级网页设计 17-1 ｜ stringify 把对象存成字符串，parse 再还原取值</p>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // ===== JSON.stringify：JS 对象转 JSON 字符串 =====
+            function wyh_runStringify() {
+                var wyh_obj = { name: "王云鹤", age: 20, hobbies: ["网页设计", "篮球"] };
+                var wyh_json = JSON.stringify(wyh_obj);
+                console.log("stringify结果：" + wyh_json);
+                document.getElementById("wyh_stringifyResult").innerHTML =
+                    "JS 对象 → JSON 字符串：<b>" + wyh_json + "</b><br>类型：typeof 结果为 <b>" + typeof wyh_json + "</b>（string）";
+            }
+
+            // ===== JSON.parse：JSON 字符串转 JS 对象 =====
+            function wyh_runParse() {
+                var wyh_jsonStr = '{"brand":"Apple","price":8999,"colors":["黑色","白色"]}';
+                var wyh_obj2 = JSON.parse(wyh_jsonStr);
+                console.log("parse结果：", wyh_obj2);
+                document.getElementById("wyh_parseResult").innerHTML =
+                    "JSON 字符串 → JS 对象后即可取值：<b>" + wyh_obj2.brand + " 手机售价 " + wyh_obj2.price +
+                    " 元，颜色有 " + wyh_obj2.colors.join("、") + "</b><br>类型：typeof 结果为 <b>" + typeof wyh_obj2 + "</b>（object）";
+            }
+
+            // 绑定按钮点击事件
+            document.getElementById("wyh_btnStringify").addEventListener("click", wyh_runStringify);
+            document.getElementById("wyh_btnParse").addEventListener("click", wyh_runParse);
+
+            // 页面加载后自动演示一次
+            wyh_runStringify();
+            wyh_runParse();
+        })();
+    </script>
+</body>
+</html>
