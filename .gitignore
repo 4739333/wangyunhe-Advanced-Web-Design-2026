@@ -1,2 +1,6 @@
-﻿.trae/
+.trae/
 .vscode/
+.screenshots/
+.env
+node_modules/
+全栈项目/backend/db/*.db

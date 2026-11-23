@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-23 功能：AI新闻列表(Supabase) -->
+<html lang="zh-CN">
+<head>
+    <!-- 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-23 | 大模型：GLM-5.3-Flash -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 资讯 · WangAI</title>
+    <link rel="stylesheet" href="fonts/wang_iconfont.css">
+    <link rel="stylesheet" href="css/wang_style.css">
+    <style>
+        /* 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-23 | 大模型：GLM-5.3-Flash */
+        /* HUD 深色主题（沿用 ui-ux-pro-max 设计令牌），公共样式见 css/wang_style.css */
+        .wang_n_layout { max-width: 1240px; margin: 24px auto; padding: 0 20px; }
+
+        /* 头部横幅 */
+        .wang_n_hero { padding: 26px 28px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .wang_n_hero .wang_n_badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #9ECBFF; background: var(--wang_accent_soft); border-radius: 999px; padding: 4px 12px; margin-bottom: 10px; }
+        .wang_n_hero h1 { font-size: 26px; color: var(--wang_fg); margin: 0 0 6px; }
+        .wang_n_hero p { font-size: 13px; color: var(--wang_muted_fg); margin: 0; }
+        .wang_n_stats { display: flex; gap: 12px; flex-wrap: wrap; }
+        .wang_n_stat { border: 1px solid var(--wang_border); border-radius: 10px; padding: 10px 16px; text-align: center; background: rgba(59, 130, 246, .05); }
+        .wang_n_stat b { display: block; font-size: 20px; color: var(--wang_accent_hi); }
+        .wang_n_stat span { font-size: 12px; color: var(--wang_muted_fg); }
+
+        /* 工具栏 */
+        .wang_n_bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 18px 2px; }
+        .wang_n_chips { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+        .wang_n_chipBtn { border: 1px solid var(--wang_border); background: transparent; color: var(--wang_muted_fg); font-size: 12.5px; border-radius: 999px; padding: 5px 14px; cursor: pointer; transition: all .15s; }
+        .wang_n_chipBtn:hover { color: var(--wang_fg); border-color: var(--wang_accent_hi); }
+        .wang_n_chipBtn.wang_n_on { background: var(--wang_accent_soft); color: #9ECBFF; border-color: var(--wang_accent_hi); }
+        .wang_n_search { display: flex; align-items: center; gap: 8px; border: 1px solid var(--wang_border); border-radius: 10px; padding: 7px 12px; background: rgba(59, 130, 246, .05); }
+        .wang_n_search i { color: var(--wang_muted_fg); font-size: 14px; }
+        .wang_n_search input { background: transparent; border: none; outline: none; color: var(--wang_fg); font-size: 13px; width: 170px; }
+
+        /* 头条 */
+        .wang_n_feat { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; padding: 22px; margin-bottom: 20px; }
+        @media (max-width: 860px) { .wang_n_feat { grid-template-columns: 1fr; } }
+        .wang_n_featImg { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 12px; border: 1px solid var(--wang_border); background: var(--wang_card); }
+        .wang_n_featTag { font-size: 12px; color: #0B0B10; background: var(--wang_accent_hi); border-radius: 6px; padding: 3px 10px; font-weight: bold; }
+        .wang_n_feat h2 { font-size: 21px; color: var(--wang_fg); margin: 12px 0 10px; line-height: 1.4; cursor: pointer; }
+        .wang_n_feat h2:hover { color: var(--wang_accent_hi); }
+        .wang_n_feat .wang_n_sum { font-size: 13.5px; color: #C7D7F5; line-height: 1.9; margin: 0 0 14px; }
+
+        /* 列表卡片 */
+        .wang_n_grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        @media (max-width: 1020px) { .wang_n_grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 680px) { .wang_n_grid { grid-template-columns: 1fr; } }
+        .wang_n_card { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; transition: transform .15s, border-color .15s; cursor: pointer; }
+        .wang_n_card:hover { transform: translateY(-3px); border-color: var(--wang_accent_hi); }
+        .wang_n_cardImg { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; border: 1px solid var(--wang_border); }
+        .wang_n_head { display: flex; justify-content: space-between; align-items: center; }
+        .wang_n_chip { font-size: 11.5px; border-radius: 6px; padding: 3px 9px; }
+        .wang_n_head time { font-size: 11.5px; color: var(--wang_muted_fg); }
+        .wang_n_card h3 { font-size: 15px; color: var(--wang_fg); margin: 0; line-height: 1.5; }
+        .wang_n_card p { font-size: 12.5px; color: var(--wang_muted_fg); line-height: 1.8; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .wang_n_foot { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+        .wang_n_foot span { font-size: 11.5px; color: var(--wang_muted_fg); }
+        .wang_n_more { border: none; background: transparent; color: var(--wang_accent_hi); font-size: 12px; cursor: pointer; padding: 0; }
+
+        /* 详情弹窗 */
+        .wang_n_mask { position: fixed; inset: 0; background: rgba(5, 8, 18, .72); backdrop-filter: blur(4px); display: none; align-items: flex-start; justify-content: center; padding: 48px 20px; z-index: 50; overflow-y: auto; }
+        .wang_n_mask.wang_n_show { display: flex; }
+        .wang_n_modal { max-width: 720px; width: 100%; padding: 28px 30px; position: relative; }
+        .wang_n_close { position: absolute; top: 16px; right: 18px; border: none; background: var(--wang_accent_soft); color: var(--wang_accent_hi); width: 30px; height: 30px; border-radius: 8px; font-size: 15px; cursor: pointer; }
+        .wang_n_modal h2 { font-size: 20px; color: var(--wang_fg); line-height: 1.5; margin: 0 40px 12px 0; }
+        .wang_n_meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+        .wang_n_meta time { font-size: 12px; color: var(--wang_muted_fg); }
+        .wang_n_body { font-size: 14px; color: #C7D7F5; line-height: 2; white-space: pre-wrap; }
+        .wang_n_empty { color: var(--wang_muted_fg); font-size: 13px; text-align: center; padding: 40px 0; }
+    </style>
+</head>
+<body class="wang_body">
+    <header class="wang_topbar">
+        <span class="wang_logo"><i class="wang_ic wang_ic_star"></i>WangAI 聊天</span>
+        <nav class="wang_nav">
+            <a href="index.html">首页</a>
+            <a href="chat.html">本地聊天</a>
+            <a href="ai_chat.html">AI 流式聊天</a>
+            <a href="history.html">会话历史</a>
+            <a href="kb.html">知识库问答</a>
+            <a href="news.html">科技新闻</a>
+            <a href="gallery.html">图文展示</a>
+            <a href="ai_news.html" class="wang_nav_on">AI 资讯</a>
+        </nav>
+        <span class="wang_topbar_user">王云鹤 · 24002060416</span>
+    </header>
+
+    <main class="wang_n_layout">
+        <!-- 头部横幅：标题 + 统计 -->
+        <section class="wang_n_hero wang_card">
+            <div>
+                <span class="wang_n_badge"><i class="wang_ic wang_ic_grid"></i> Supabase 数据源 · rimojqybhwaciigumezw · 表 wang_ai_news</span>
+                <h1>AI 资讯</h1>
+                <p>服务端为 Supabase（远程 PostgreSQL），前端通过原生 fetch 直连 REST API 匿名只读，请求与响应数据见浏览器控制台 F12。</p>
+            </div>
+            <div class="wang_n_stats">
+                <div class="wang_n_stat"><b id="wang_nTotal">-</b><span>新闻总数</span></div>
+                <div class="wang_n_stat"><b id="wang_nCats">-</b><span>分类数</span></div>
+                <div class="wang_n_stat"><b id="wang_nLatest">-</b><span>最新发布</span></div>
+            </div>
+        </section>
+
+        <!-- 工具栏：分类筛选 + 搜索 + 刷新 -->
+        <div class="wang_n_bar">
+            <div class="wang_n_chips" id="wang_nChips"></div>
+            <label class="wang_n_search"><i class="wang_ic wang_ic_book"></i><input type="text" id="wang_nKeyword" placeholder="搜索标题 / 摘要…"></label>
+            <button class="wang_btn" id="wang_nRefresh"><i class="wang_ic wang_ic_bell"></i> 刷新</button>
+        </div>
+        <div class="wang_tip" id="wang_nTip"></div>
+
+        <!-- 头条（含配图） -->
+        <section id="wang_nFeatBox"></section>
+
+        <!-- 新闻卡片列表 -->
+        <section class="wang_n_grid" id="wang_nGrid"></section>
+        <div class="wang_n_empty" id="wang_nEmpty" hidden>没有符合条件的新闻</div>
+    </main>
+
+    <!-- 详情弹窗 -->
+    <div class="wang_n_mask" id="wang_nMask">
+        <article class="wang_n_modal wang_card">
+            <button class="wang_n_close" id="wang_nClose" title="关闭">✕</button>
+            <div id="wang_nModalBody"></div>
+        </article>
+    </div>
+
+    <script src="js/wang_ai_news.js"></script>
+</body>
+</html>

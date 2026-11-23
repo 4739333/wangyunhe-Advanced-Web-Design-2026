@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-12 功能：科技新闻列表页（数据来自数据库 wang_news 表） -->
+<html lang="zh-CN">
+<head>
+    <!-- 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科技新闻 · WangAI</title>
+    <link rel="stylesheet" href="fonts/wang_iconfont.css">
+    <link rel="stylesheet" href="css/wang_style.css">
+    <style>
+        /* 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash */
+        .wang_news_api { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; font-size: 13.5px; color: var(--wang_muted_fg); }
+        .wang_news_api code { background: var(--wang_accent_soft); border-radius: 6px; padding: 3px 10px; color: #9ECBFF; }
+        .wang_news_list { display: flex; flex-direction: column; gap: 14px; }
+        .wang_news_item { padding: 18px 22px; display: flex; flex-direction: column; gap: 8px; transition: transform .2s, box-shadow .2s, border-color .2s; }
+        .wang_news_item:hover { transform: translateY(-3px); border-color: rgba(96, 165, 250, .5); box-shadow: 0 18px 34px -20px rgba(0, 0, 0, .9), 0 0 20px -10px rgba(59, 130, 246, .4); }
+        .wang_news_top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .wang_news_top .wang_badge { background: rgba(155, 109, 246, .16); color: #C4A9FF; border-color: rgba(155, 109, 246, .45); }
+        .wang_news_top time { margin-left: auto; font-size: 12.5px; color: var(--wang_muted_fg); }
+        .wang_news_item h2 { font-size: 16.5px; color: var(--wang_fg); }
+        .wang_news_item h2 a:hover { color: var(--wang_accent_hi); }
+        .wang_news_item p { font-size: 13.5px; color: var(--wang_muted_fg); line-height: 1.8; }
+        .wang_news_src { font-size: 12.5px; color: var(--wang_muted_fg); }
+        .wang_news_src a { color: var(--wang_accent_hi); }
+    </style>
+</head>
+<body class="wang_body">
+    <header class="wang_topbar">
+        <span class="wang_logo"><i class="wang_ic wang_ic_star"></i>WangAI 聊天</span>
+        <nav class="wang_nav">
+            <a href="index.html">首页</a>
+            <a href="chat.html">本地聊天</a>
+            <a href="ai_chat.html">AI 流式聊天</a>
+            <a href="history.html">会话历史</a>
+            <a href="kb.html">知识库问答</a>
+            <a href="news.html" class="wang_nav_on">科技新闻</a>
+            <a href="gallery.html">图文展示</a>
+            <a href="ai_news.html">AI 资讯</a>
+        </nav>
+        <span class="wang_topbar_user">王云鹤 · 24002060416</span>
+    </header>
+
+    <main class="wang_page">
+        <h1><i class="wang_ic wang_ic_grid" style="color:var(--wang_accent_hi)"></i> 科技新闻</h1>
+        <p>新闻数据保存在数据库 wang_news 表中（8 条测试数据），页面通过后端接口动态加载，收发数据见浏览器控制台（F12）。</p>
+
+        <div class="wang_news_api">
+            后端接口：<code>GET /api/news</code>
+            <a class="wang_btn wang_btn_ghost" style="padding:5px 14px;font-size:12.5px" id="wang_reloadBtn">刷新数据</a>
+        </div>
+
+        <div class="wang_tip" id="wang_tip"></div>
+        <div class="wang_news_list" id="wang_newsList">
+            <div class="wang_empty" style="padding:40px">加载中…</div>
+        </div>
+    </main>
+
+    <script src="js/wang_api.js"></script>
+    <script>
+        /* 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash */
+        /* 科技新闻页：请求 GET /api/news 并渲染列表 */
+        const wang_nList = document.getElementById('wang_newsList');
+        const wang_nTip = document.getElementById('wang_tip');
+
+        async function wang_loadNews() {
+            wang_nList.innerHTML = '<div class="wang_empty" style="padding:40px">加载中…</div>';
+            const wang_json = await wang_getNews();
+            if (wang_json.code !== 0) {
+                wang_nTip.style.display = 'block';
+                wang_nTip.textContent = '接口请求失败：' + wang_json.msg;
+                wang_nList.innerHTML = '';
+                return;
+            }
+            wang_nTip.style.display = 'none';
+            wang_nList.innerHTML = wang_json.data.map(n => `
+                <article class="wang_news_item wang_card">
+                    <div class="wang_news_top">
+                        <span class="wang_badge">${wang_esc(n.wang_tag)}</span>
+                        <span class="wang_news_src"><i class="wang_ic wang_ic_book"></i> ${wang_esc(n.wang_source)}</span>
+                        <time>${wang_esc(n.wang_pub_date)}</time>
+                    </div>
+                    <h2><a href="${wang_esc(n.wang_url)}" target="_blank" rel="noopener">${wang_esc(n.wang_title)}</a></h2>
+                    <p>${wang_esc(n.wang_summary)}</p>
+                </article>`).join('');
+        }
+
+        document.getElementById('wang_reloadBtn').addEventListener('click', wang_loadNews);
+        wang_loadNews();
+    </script>
+</body>
+</html>

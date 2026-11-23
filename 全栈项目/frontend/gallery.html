@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-12 功能：图文列表页（数据来自数据库 wang_gallery 表，图片为文生图服务生成） -->
+<html lang="zh-CN">
+<head>
+    <!-- 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图文展示 · WangAI</title>
+    <link rel="stylesheet" href="fonts/wang_iconfont.css">
+    <link rel="stylesheet" href="css/wang_style.css">
+    <style>
+        /* 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash */
+        .wang_gal_api { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; font-size: 13.5px; color: var(--wang_muted_fg); }
+        .wang_gal_api code { background: var(--wang_accent_soft); border-radius: 6px; padding: 3px 10px; color: #9ECBFF; }
+        .wang_gal_grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+        .wang_gal_card { overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s, border-color .2s; }
+        .wang_gal_card:hover { transform: translateY(-4px); border-color: rgba(96, 165, 250, .5); box-shadow: 0 20px 38px -20px rgba(0, 0, 0, .9), 0 0 20px -10px rgba(59, 130, 246, .4); }
+        .wang_gal_card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: var(--wang_muted); }
+        .wang_gal_body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+        .wang_gal_body h2 { font-size: 15.5px; color: var(--wang_fg); }
+        .wang_gal_body p { font-size: 12.8px; color: var(--wang_muted_fg); line-height: 1.7; flex: 1; }
+        .wang_gal_foot { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--wang_muted_fg); }
+        .wang_gal_foot .wang_badge { margin-left: auto; }
+    </style>
+</head>
+<body class="wang_body">
+    <header class="wang_topbar">
+        <span class="wang_logo"><i class="wang_ic wang_ic_star"></i>WangAI 聊天</span>
+        <nav class="wang_nav">
+            <a href="index.html">首页</a>
+            <a href="chat.html">本地聊天</a>
+            <a href="ai_chat.html">AI 流式聊天</a>
+            <a href="history.html">会话历史</a>
+            <a href="kb.html">知识库问答</a>
+            <a href="news.html">科技新闻</a>
+            <a href="gallery.html" class="wang_nav_on">图文展示</a>
+            <a href="ai_news.html">AI 资讯</a>
+        </nav>
+        <span class="wang_topbar_user">王云鹤 · 24002060416</span>
+    </header>
+
+    <main class="wang_page">
+        <h1><i class="wang_ic wang_ic_bell" style="color:var(--wang_accent_hi)"></i> 图文展示</h1>
+        <p>图文数据保存在新建的数据库 wang_gallery 表中（8 条），图片由文生图服务按提示词生成，页面通过后端接口动态加载。</p>
+
+        <div class="wang_gal_api">
+            后端接口：<code>GET /api/gallery</code>
+            <a class="wang_btn wang_btn_ghost" style="padding:5px 14px;font-size:12.5px" id="wang_reloadBtn">刷新数据</a>
+        </div>
+
+        <div class="wang_tip" id="wang_tip"></div>
+        <div class="wang_gal_grid" id="wang_galGrid">
+            <div class="wang_empty" style="padding:40px;grid-column:1/-1">加载中…</div>
+        </div>
+    </main>
+
+    <script src="js/wang_api.js"></script>
+    <script>
+        /* 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash */
+        /* 图文列表页：请求 GET /api/gallery 并渲染卡片网格 */
+        const wang_gGrid = document.getElementById('wang_galGrid');
+        const wang_gTip = document.getElementById('wang_tip');
+
+        async function wang_loadGallery() {
+            wang_gGrid.innerHTML = '<div class="wang_empty" style="padding:40px;grid-column:1/-1">加载中…</div>';
+            const wang_json = await wang_getGallery();
+            if (wang_json.code !== 0) {
+                wang_gTip.style.display = 'block';
+                wang_gTip.textContent = '接口请求失败：' + wang_json.msg;
+                wang_gGrid.innerHTML = '';
+                return;
+            }
+            wang_gTip.style.display = 'none';
+            wang_gGrid.innerHTML = wang_json.data.map(g => `
+                <article class="wang_gal_card wang_card">
+                    <img src="${wang_esc(g.wang_image)}" alt="${wang_esc(g.wang_title)}" loading="lazy">
+                    <div class="wang_gal_body">
+                        <h2>${wang_esc(g.wang_title)}</h2>
+                        <p>${wang_esc(g.wang_description)}</p>
+                        <div class="wang_gal_foot">
+                            <i class="wang_ic wang_ic_user"></i>${wang_esc(g.wang_author)}
+                            <span class="wang_badge">${wang_esc(g.wang_category)}</span>
+                        </div>
+                    </div>
+                </article>`).join('');
+        }
+
+        document.getElementById('wang_reloadBtn').addEventListener('click', wang_loadGallery);
+        wang_loadGallery();
+    </script>
+</body>
+</html>

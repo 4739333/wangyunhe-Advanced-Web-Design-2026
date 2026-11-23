@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-12 功能：会话详情只读页（detail 页，不入 index 入口） -->
+<html lang="zh-CN">
+<head>
+    <!-- 姓名：王云鹤 | 学号：0416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会话详情 · WangAI</title>
+    <link rel="stylesheet" href="fonts/wang_iconfont.css">
+    <link rel="stylesheet" href="css/wang_style.css">
+</head>
+<body class="wang_body">
+    <header class="wang_topbar">
+        <span class="wang_logo"><i class="wang_ic wang_ic_star"></i>WangAI 聊天</span>
+        <nav class="wang_nav">
+            <a href="index.html">首页</a>
+            <a href="chat.html">本地聊天</a>
+            <a href="ai_chat.html">AI 流式聊天</a>
+            <a href="history.html" class="wang_nav_on">会话历史</a>
+            <a href="kb.html">知识库问答</a>
+            <a href="news.html">科技新闻</a>
+            <a href="gallery.html">图文展示</a>
+            <a href="ai_news.html">AI 资讯</a>
+        </nav>
+        <span class="wang_topbar_user">王云鹤 · 24002060416</span>
+    </header>
+
+    <main class="wang_chat_layout" style="grid-template-columns:1fr">
+        <section class="wang_main wang_card">
+            <div class="wang_msg_area" id="wang_msgArea">
+                <div class="wang_empty"><i class="wang_ic wang_ic_bell"></i>加载中…</div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/wang_api.js"></script>
+    <script src="js/wang_detail.js"></script>
+</body>
+</html>

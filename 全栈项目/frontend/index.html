@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-12 功能：项目首页（canvas 背景动画 + 姓名学号 + 全部页面导航） -->
+<html lang="zh-CN">
+<head>
+    <!-- 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM 应用设计 · WangAI 智能聊天系统</title>
+    <link rel="stylesheet" href="fonts/wang_iconfont.css">
+    <link rel="stylesheet" href="css/wang_style.css">
+    <style>
+        /* 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash */
+        /* 首页 HUD 深色主题（ui-ux-pro-max 设计系统：#0B0B10 底 + #3B82F6 霓虹 + 玻璃卡片） */
+        body.wang_home { background-color: var(--wang_bg); background-image: radial-gradient(120% 90% at 50% 0%, #141B33 0%, #0B0B10 55%, #060608 100%), linear-gradient(rgba(59, 130, 246, .045) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, .045) 1px, transparent 1px); background-size: auto, 42px 42px, 42px 42px; color: #DBE6FF; }
+        .wang_canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+        .wang_home main { position: relative; z-index: 1; }
+        .wang_home .wang_topbar { background: rgba(15, 17, 28, .6); border-bottom-color: rgba(96, 165, 250, .18); }
+        .wang_home .wang_nav a { color: #9FB4E6; }
+        .wang_home .wang_nav a:hover, .wang_home .wang_nav a.wang_nav_on { color: var(--wang_accent_hi); }
+        .wang_home .wang_topbar_user { color: #8FA3D0; }
+        .wang_home .wang_card { background: rgba(24, 30, 52, .55); border-color: rgba(96, 165, 250, .2); backdrop-filter: blur(12px); }
+
+        .wang_hero { max-width: 900px; margin: 84px auto 26px; text-align: center; padding: 0 20px; }
+        .wang_hero_tag { display: inline-block; font-size: 13px; letter-spacing: 3px; color: var(--wang_accent_hi); border: 1px solid rgba(96, 165, 250, .4); border-radius: 20px; padding: 5px 18px; margin-bottom: 22px; background: rgba(59, 130, 246, .12); }
+        .wang_hero h1 { font-size: 42px; letter-spacing: 3px; background: linear-gradient(90deg, #60A5FA, #9B6DF6, #38BDF8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
+        .wang_hero > p { color: #93A7CF; font-size: 15px; line-height: 1.9; }
+        .wang_meta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+        .wang_meta span { border: 1px solid rgba(96, 165, 250, .35); border-radius: 20px; padding: 7px 18px; font-size: 13.5px; color: #BCD2FF; background: rgba(59, 130, 246, .12); }
+
+        .wang_home .wang_entries { max-width: 1020px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+        .wang_home .wang_entry { padding: 24px 20px; }
+        .wang_home .wang_entry h3 { color: #EAF2FF; }
+        .wang_home .wang_entry p { color: #93A7CF; }
+        .wang_home .wang_entry i { color: var(--wang_accent_hi); }
+
+        .wang_home .wang_api_list { color: #BCD2FF; }
+        .wang_home .wang_api_list h2 { color: var(--wang_accent_hi); }
+        .wang_home .wang_api_list code { background: rgba(59, 130, 246, .22); color: #9ECBFF; }
+        .wang_home_footer { position: relative; z-index: 1; text-align: center; color: #5F7196; font-size: 12.5px; padding: 10px 0 40px; }
+    </style>
+</head>
+<body class="wang_body wang_home">
+    <canvas id="wang_canvas" class="wang_canvas"></canvas>
+
+    <header class="wang_topbar">
+        <span class="wang_logo"><i class="wang_ic wang_ic_star"></i>WangAI</span>
+        <nav class="wang_nav">
+            <a href="index.html" class="wang_nav_on">首页</a>
+            <a href="chat.html">本地聊天</a>
+            <a href="ai_chat.html">AI 流式聊天</a>
+            <a href="history.html">会话历史</a>
+            <a href="kb.html">知识库问答</a>
+            <a href="news.html">科技新闻</a>
+            <a href="gallery.html">图文展示</a>
+            <a href="ai_news.html">AI 资讯</a>
+        </nav>
+        <span class="wang_topbar_user">王云鹤 · 24002060416</span>
+    </header>
+
+    <main>
+        <section class="wang_hero">
+            <span class="wang_hero_tag">高级网页设计 I · LLM 应用设计实验</span>
+            <h1>WangAI 智能聊天系统</h1>
+            <p>前后端分离全栈架构：原生 HTML / CSS / JavaScript + Node.js / Express 中间层 + SQLite 数据库。<br>
+               调用 DeepSeek 大模型 API，支持多轮上下文、SSE 流式输出与中断、历史压缩摘要与会话管理。</p>
+            <div class="wang_meta">
+                <span>姓名：王云鹤</span>
+                <span>学号：24002060416</span>
+                <span>项目名称：LLM 应用设计（AI 聊天）</span>
+                <span>项目类别：自选</span>
+            </div>
+        </section>
+
+        <section class="wang_entries">
+            <a class="wang_entry wang_card" href="ai_chat.html">
+                <i class="wang_ic wang_ic_star"></i>
+                <h3>AI 流式聊天</h3>
+                <p>后端代理大模型，SSE 流式输出可中断，Markdown 渲染，消息落库与历史回放。</p>
+            </a>
+            <a class="wang_entry wang_card" href="chat.html">
+                <i class="wang_ic wang_ic_user"></i>
+                <h3>本地聊天</h3>
+                <p>不依赖大模型的本地规则回复引擎，会话与消息同样持久化在 SQLite。</p>
+            </a>
+            <a class="wang_entry wang_card" href="history.html">
+                <i class="wang_ic wang_ic_book"></i>
+                <h3>会话历史</h3>
+                <p>按用户查看全部会话与消息条数，支持重命名、删除与详情查看。</p>
+            </a>
+            <a class="wang_entry wang_card" href="kb.html">
+                <i class="wang_ic wang_ic_book"></i>
+                <h3>知识库问答 (RAG)</h3>
+                <p>上传 doc / docx / txt 解析入库，检索命中资料注入提示词，智能客服 SSE 流式回答。</p>
+            </a>
+            <a class="wang_entry wang_card" href="news.html">
+                <i class="wang_ic wang_ic_grid"></i>
+                <h3>科技新闻</h3>
+                <p>新闻数据存于 wang_news 表，前端通过 GET /api/news 获取并渲染列表。</p>
+            </a>
+            <a class="wang_entry wang_card" href="gallery.html">
+                <i class="wang_ic wang_ic_bell"></i>
+                <h3>图文展示</h3>
+                <p>图文数据存于 wang_gallery 表，图片由文生图服务生成，GET /api/gallery。</p>
+            </a>
+            <a class="wang_entry wang_card" href="ai_news.html">
+                <i class="wang_ic wang_ic_grid"></i>
+                <h3>AI 资讯</h3>
+                <p>数据存于 Supabase 远程 PostgreSQL（wang_ai_news 表），前端原生 fetch 直连 REST 匿名只读。</p>
+            </a>
+            <a class="wang_entry wang_card" href="session_detail.html?wang_id=1">
+                <i class="wang_ic wang_ic_home"></i>
+                <h3>会话详情示例</h3>
+                <p>只读消息回放页（示例加载 1 号会话），任意会话可从历史页一跳进入。</p>
+            </a>
+        </section>
+
+        <section class="wang_api_list wang_card">
+            <h2>后端接口清单（统一响应 {code, msg, data}，端口 416 = 学号后三位）</h2>
+            <div><code>GET /api/users</code>用户列表</div>
+            <div><code>GET /api/sessions?wang_user_id=</code>会话列表（含消息数）</div>
+            <div><code>POST /api/sessions</code>新建会话　<code>PUT /api/sessions/:id</code>重命名会话</div>
+            <div><code>DELETE /api/sessions/:id</code>删除会话（级联删消息）</div>
+            <div><code>GET /api/sessions/:id/messages</code>会话消息回放</div>
+            <div><code>POST /api/chat</code>本地规则引擎聊天</div>
+            <div><code>POST /api/ai/chat</code>大模型非流式对话</div>
+            <div><code>POST /api/ai/chat/stream</code>大模型 SSE 流式对话（落库 + 压缩摘要）</div>
+            <div><code>POST /api/kb/upload</code>知识库文件上传解析　<code>GET /api/kb/docs</code>文档列表　<code>DELETE /api/kb/docs/:id</code>删除文档</div>
+            <div><code>POST /api/kb/search</code>知识库检索　<code>POST /api/kb/chat/stream</code>RAG 智能客服 SSE 问答</div>
+            <div><code>GET /api/news</code>科技新闻列表</div>
+            <div><code>GET /api/gallery</code>图文展示列表</div>
+            <div><code>Supabase REST</code>AI 资讯列表（服务器端为 Supabase 远程 PostgreSQL，表 wang_ai_news，前端原生 fetch 匿名只读，见根目录 database.md）</div>
+        </section>
+
+        <footer class="wang_home_footer">王云鹤 · 24002060416 · 大连东软信息学院 · 高级网页设计 I 全栈项目 · 2026-11-12</footer>
+    </main>
+
+    <script>
+        /* 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash */
+        /* canvas 背景动画：粒子网络（漂浮圆点 + 邻近连线），原生实现，无任何第三方库 */
+        (function () {
+            const wang_cv = document.getElementById('wang_canvas');
+            const wang_ctx = wang_cv.getContext('2d');
+            let wang_w = 0, wang_h = 0, wang_pts = [];
+
+            function wang_init() {
+                wang_w = wang_cv.width = window.innerWidth;
+                wang_h = wang_cv.height = window.innerHeight;
+                const wang_n = Math.min(110, Math.floor(wang_w * wang_h / 16000));
+                wang_pts = Array.from({ length: wang_n }, () => ({
+                    x: Math.random() * wang_w,
+                    y: Math.random() * wang_h,
+                    vx: (Math.random() - .5) * .5,
+                    vy: (Math.random() - .5) * .5,
+                    r: Math.random() * 1.6 + .6
+                }));
+            }
+
+            function wang_tick() {
+                wang_ctx.clearRect(0, 0, wang_w, wang_h);
+                for (const p of wang_pts) {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0 || p.x > wang_w) p.vx *= -1;
+                    if (p.y < 0 || p.y > wang_h) p.vy *= -1;
+                    wang_ctx.beginPath();
+                    wang_ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    wang_ctx.fillStyle = 'rgba(96,165,250,.85)';
+                    wang_ctx.fill();
+                }
+                for (let i = 0; i < wang_pts.length; i++) {
+                    for (let j = i + 1; j < wang_pts.length; j++) {
+                        const dx = wang_pts[i].x - wang_pts[j].x, dy = wang_pts[i].y - wang_pts[j].y;
+                        const d2 = dx * dx + dy * dy;
+                        if (d2 < 16900) {
+                            wang_ctx.beginPath();
+                            wang_ctx.moveTo(wang_pts[i].x, wang_pts[i].y);
+                            wang_ctx.lineTo(wang_pts[j].x, wang_pts[j].y);
+                            wang_ctx.strokeStyle = 'rgba(59,130,246,' + (0.4 * (1 - d2 / 16900)).toFixed(3) + ')';
+                            wang_ctx.lineWidth = 1;
+                            wang_ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(wang_tick);
+            }
+
+            window.addEventListener('resize', wang_init);
+            wang_init();
+            wang_tick();
+        })();
+    </script>
+</body>
+</html>

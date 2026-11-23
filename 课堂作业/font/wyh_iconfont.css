@@ -1,0 +1,23 @@
+/* 姓名：王云鹤 日期：2026-10-22 功能：个性化iconfont字体图标样式（由自绘SVG路径生成） */
+@font-face {
+    font-family: "wyh-iconfont";
+    src: url("wyh_iconfont.woff") format("woff"),
+         url("wyh_iconfont.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+.wyh_if {
+    font-family: "wyh-iconfont" !important;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.wyh_if_home::before  { content: ""; }
+.wyh_if_book::before  { content: ""; }
+.wyh_if_grid::before  { content: ""; }
+.wyh_if_bell::before  { content: ""; }
+.wyh_if_user::before  { content: ""; }
+.wyh_if_star::before  { content: ""; }

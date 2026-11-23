@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-12 功能：AI流式聊天页（大模型SSE流式对话+会话管理+Markdown渲染） -->
+<html lang="zh-CN">
+<head>
+    <!-- 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 流式聊天 · WangAI</title>
+    <link rel="stylesheet" href="fonts/wang_iconfont.css">
+    <link rel="stylesheet" href="css/wang_style.css">
+    <style>
+        /* 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash */
+        /* HUD 深色主题（ui-ux-pro-max 设计系统），公共样式见 css/wang_style.css */
+        .wang_ai_head {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 20px; border-bottom: 1px solid var(--wang_border);
+            font-size: 15px; font-weight: bold; color: #C7D7F5;
+        }
+        .wang_ai_head i { color: var(--wang_purple); font-size: 20px; }
+        .wang_ai_head small { font-weight: normal; color: var(--wang_muted_fg); font-size: 12px; margin-left: auto; }
+        .wang_msg_err .wang_bubble { background: rgba(239, 68, 68, .1); border: 1px solid rgba(239, 68, 68, .45); color: var(--wang_danger); }
+
+        /* 会话条目操作按钮 */
+        .wang_s_act { display: flex; gap: 5px; flex: none; }
+        .wang_s_act button {
+            border: 1px solid var(--wang_border); background: var(--wang_muted); color: var(--wang_muted_fg);
+            width: 22px; height: 22px; border-radius: 6px; font-size: 11px; cursor: pointer; line-height: 1;
+            transition: color .2s, border-color .2s;
+        }
+        .wang_s_act button:hover { color: var(--wang_accent_hi); border-color: var(--wang_accent); }
+
+        /* 停止按钮（流式期间显示） */
+        #wang_stopBtn { display: none; background: rgba(239, 68, 68, .08); color: var(--wang_danger); border: 1.5px solid rgba(239, 68, 68, .45); box-shadow: none; }
+    </style>
+</head>
+<body class="wang_body">
+    <header class="wang_topbar">
+        <span class="wang_logo"><i class="wang_ic wang_ic_star"></i>WangAI 聊天</span>
+        <nav class="wang_nav">
+            <a href="index.html">首页</a>
+            <a href="chat.html">本地聊天</a>
+            <a href="ai_chat.html" class="wang_nav_on">AI 流式聊天</a>
+            <a href="history.html">会话历史</a>
+            <a href="kb.html">知识库问答</a>
+            <a href="news.html">科技新闻</a>
+            <a href="gallery.html">图文展示</a>
+            <a href="ai_news.html">AI 资讯</a>
+        </nav>
+        <span class="wang_topbar_user">王云鹤 · 24002060416</span>
+    </header>
+
+    <main class="wang_chat_layout">
+        <aside class="wang_side wang_card">
+            <span class="wang_side_title">当前用户</span>
+            <div class="wang_select" style="background:var(--wang_muted)">王云鹤 · 24002060416</div>
+            <button class="wang_btn" id="wang_newBtn"><i class="wang_ic wang_ic_grid"></i> 新建会话</button>
+            <span class="wang_side_title">我的 AI 会话</span>
+            <div class="wang_session_list" id="wang_sessionList"></div>
+        </aside>
+
+        <section class="wang_main wang_card">
+            <div class="wang_ai_head">
+                <i class="wang_ic wang_ic_star"></i><span id="wang_aiTitle">DeepSeek 流式对话</span>
+                <small>Model: deepseek-flash · 多轮上下文/落库/压缩摘要 · 收发数据见控制台（F12）</small>
+            </div>
+            <div class="wang_msg_area" id="wang_msgArea">
+                <div class="wang_empty"><i class="wang_ic wang_ic_bell"></i>加载中…</div>
+            </div>
+            <div class="wang_input_bar">
+                <textarea class="wang_textarea" id="wang_inputBox" placeholder="输入消息，Enter 发送，Shift+Enter 换行"></textarea>
+                <button class="wang_btn" id="wang_stopBtn">■ 停止</button>
+                <button class="wang_btn" id="wang_sendBtn">发送</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/wang_api.js"></script>
+    <script src="js/wang_ai.js"></script>
+</body>
+</html>

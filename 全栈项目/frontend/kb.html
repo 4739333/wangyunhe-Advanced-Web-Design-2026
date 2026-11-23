@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-12 功能：RAG知识库管理与智能客服问答页（doc/docx/txt上传解析+检索问答） -->
+<html lang="zh-CN">
+<head>
+    <!-- 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库问答 · WangAI</title>
+    <link rel="stylesheet" href="fonts/wang_iconfont.css">
+    <link rel="stylesheet" href="css/wang_style.css">
+    <style>
+        /* 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash */
+        /* HUD 深色主题（ui-ux-pro-max 设计系统），公共样式与 Markdown 渲染见 css/wang_style.css */
+        .wang_kb_layout {
+            max-width: 1240px; margin: 24px auto; padding: 0 20px;
+            display: grid; grid-template-columns: 430px 1fr; gap: 20px; align-items: start;
+        }
+        @media (max-width: 980px) { .wang_kb_layout { grid-template-columns: 1fr; } }
+        .wang_kb_panel { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+        .wang_kb_panel h2 { font-size: 16px; color: var(--wang_fg); display: flex; align-items: center; gap: 8px; }
+        .wang_kb_panel h2 i { color: var(--wang_accent_hi); }
+        .wang_kb_api { font-size: 12.5px; color: var(--wang_muted_fg); }
+        .wang_kb_api code { background: var(--wang_accent_soft); border-radius: 5px; padding: 2px 8px; color: #9ECBFF; }
+
+        /* 上传区 */
+        .wang_up_box { border: 2px dashed rgba(96, 165, 250, .45); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: rgba(59, 130, 246, .06); }
+        .wang_up_box input[type=file] { font-size: 13px; color: #C7D7F5; }
+        .wang_up_box input[type=file]::file-selector-button { background: var(--wang_muted); color: var(--wang_accent_hi); border: 1px solid var(--wang_border); border-radius: 8px; padding: 6px 12px; margin-right: 10px; cursor: pointer; }
+        .wang_up_tip { font-size: 12px; color: var(--wang_muted_fg); }
+
+        /* 文档表格 */
+        .wang_kb_table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .wang_kb_table th, .wang_kb_table td { padding: 8px 9px; border-bottom: 1px solid #16161C; text-align: left; color: #C7D7F5; }
+        .wang_kb_table th { color: var(--wang_muted_fg); font-weight: normal; font-size: 12px; }
+        .wang_kb_table td button { border: 1px solid rgba(239, 68, 68, .45); background: rgba(239, 68, 68, .08); color: var(--wang_danger); border-radius: 6px; font-size: 11.5px; padding: 3px 9px; cursor: pointer; transition: background .2s; }
+        .wang_kb_table td button:hover { background: rgba(239, 68, 68, .18); }
+
+        /* 检索演示 */
+        .wang_kb_search { display: flex; gap: 8px; }
+        .wang_kb_search input { flex: 1; border: 1.5px solid var(--wang_border); border-radius: 9px; padding: 8px 12px; font-size: 13.5px; background: var(--wang_muted); color: var(--wang_fg); outline: none; transition: border-color .2s, box-shadow .2s; }
+        .wang_kb_search input:focus { border-color: var(--wang_accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, .3); }
+        .wang_hit { background: rgba(59, 130, 246, .08); border-left: 3px solid var(--wang_accent); border-radius: 0 8px 8px 0; padding: 8px 11px; font-size: 12.5px; color: #C7D7F5; line-height: 1.6; }
+        .wang_hit b { color: var(--wang_accent_hi); }
+
+        /* 问答区 */
+        .wang_kb_chat { display: flex; flex-direction: column; height: 76vh; min-height: 520px; }
+        .wang_kb_head { display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-bottom: 1px solid var(--wang_border); font-size: 15px; font-weight: bold; color: #C7D7F5; }
+        .wang_kb_head i { color: var(--wang_purple); font-size: 20px; }
+        .wang_kb_head small { font-weight: normal; color: var(--wang_muted_fg); font-size: 12px; margin-left: auto; }
+        .wang_ref { display: inline-block; margin: 3px 4px 0 0; background: rgba(155, 109, 246, .16); color: #C4A9FF; border: 1px solid rgba(155, 109, 246, .45); border-radius: 6px; padding: 2px 8px; font-size: 11px; }
+        #wang_stopBtn { display: none; background: rgba(239, 68, 68, .08); color: var(--wang_danger); border: 1.5px solid rgba(239, 68, 68, .45); box-shadow: none; }
+    </style>
+</head>
+<body class="wang_body">
+    <header class="wang_topbar">
+        <span class="wang_logo"><i class="wang_ic wang_ic_star"></i>WangAI 聊天</span>
+        <nav class="wang_nav">
+            <a href="index.html">首页</a>
+            <a href="chat.html">本地聊天</a>
+            <a href="ai_chat.html">AI 流式聊天</a>
+            <a href="history.html">会话历史</a>
+            <a href="kb.html" class="wang_nav_on">知识库问答</a>
+            <a href="news.html">科技新闻</a>
+            <a href="gallery.html">图文展示</a>
+            <a href="ai_news.html">AI 资讯</a>
+        </nav>
+        <span class="wang_topbar_user">王云鹤 · 24002060416</span>
+    </header>
+
+    <main class="wang_kb_layout">
+        <!-- 左：知识库管理（上传 / 列表 / 删除 / 检索演示） -->
+        <section class="wang_kb_panel wang_card">
+            <h2><i class="wang_ic wang_ic_book"></i>知识库管理</h2>
+            <div class="wang_kb_api">上传接口：<code>POST /api/kb/upload</code>　列表：<code>GET /api/kb/docs</code>　删除：<code>DELETE /api/kb/docs/:id</code></div>
+            <div class="wang_up_box">
+                <input type="file" id="wang_fileInput" accept=".doc,.docx,.txt">
+                <button class="wang_btn" id="wang_uploadBtn"><i class="wang_ic wang_ic_grid"></i> 上传并解析入库</button>
+                <span class="wang_up_tip">支持 doc / docx / txt；后端原生解析（docx 解 zip+xml，doc 二进制提取，txt 自适应编码），按段落约 380 字分块写入 wang_kb_chunks 表。</span>
+            </div>
+            <div class="wang_tip" id="wang_upTip"></div>
+            <table class="wang_kb_table">
+                <thead><tr><th>文件名</th><th>类型</th><th>块数</th><th>上传时间</th><th></th></tr></thead>
+                <tbody id="wang_docRows"><tr><td colspan="5" style="color:var(--wang_muted_fg)">加载中…</td></tr></tbody>
+            </table>
+
+            <h2 style="margin-top:8px"><i class="wang_ic wang_ic_grid"></i>检索演示</h2>
+            <div class="wang_kb_search">
+                <input id="wang_searchInput" placeholder="输入关键词，查看命中分块，如：退货">
+                <button class="wang_btn wang_btn_ghost" id="wang_searchBtn">检索</button>
+            </div>
+            <div class="wang_kb_api">检索接口：<code>POST /api/kb/search</code>（中文二元组 + 英文分词 TF 打分）</div>
+            <div id="wang_hitBox" style="display:flex;flex-direction:column;gap:8px"></div>
+        </section>
+
+        <!-- 右：基于知识库的智能客服问答 -->
+        <section class="wang_kb_panel wang_card wang_kb_chat" style="padding:0">
+            <div class="wang_kb_head">
+                <i class="wang_ic wang_ic_bell"></i>WangAI 智能客服（RAG 问答）
+                <small>问答接口：<code style="background:var(--wang_accent_soft);color:#9ECBFF;border-radius:5px;padding:2px 8px">POST /api/kb/chat/stream</code> · 收发数据见控制台（F12）</small>
+            </div>
+            <div class="wang_msg_area" id="wang_msgArea" style="flex:1">
+                <div class="wang_empty"><i class="wang_ic wang_ic_bell"></i>可尝试提问："退货政策是什么？"、"客服工作时间？"、"课程总评成绩怎么构成？"</div>
+            </div>
+            <div class="wang_input_bar">
+                <textarea class="wang_textarea" id="wang_inputBox" placeholder="向智能客服提问，Enter 发送，Shift+Enter 换行"></textarea>
+                <button class="wang_btn" id="wang_stopBtn">■ 停止</button>
+                <button class="wang_btn" id="wang_sendBtn">提问</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/wang_api.js"></script>
+    <script src="js/wang_kb.js"></script>
+</body>
+</html>

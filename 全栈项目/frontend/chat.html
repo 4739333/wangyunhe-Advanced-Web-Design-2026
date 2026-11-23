@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-12 功能：AI聊天对话页 -->
+<html lang="zh-CN">
+<head>
+    <!-- 姓名：王云鹤 | 学号：0416 | 时间：2026-11-12 | 大模型：Qwen3.8-Flash -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开始聊天 · WangAI</title>
+    <link rel="stylesheet" href="fonts/wang_iconfont.css">
+    <link rel="stylesheet" href="css/wang_style.css">
+</head>
+<body class="wang_body">
+    <header class="wang_topbar">
+        <span class="wang_logo"><i class="wang_ic wang_ic_star"></i>WangAI 聊天</span>
+        <nav class="wang_nav">
+            <a href="index.html">首页</a>
+            <a href="chat.html" class="wang_nav_on">本地聊天</a>
+            <a href="ai_chat.html">AI 流式聊天</a>
+            <a href="history.html">会话历史</a>
+            <a href="kb.html">知识库问答</a>
+            <a href="news.html">科技新闻</a>
+            <a href="gallery.html">图文展示</a>
+            <a href="ai_news.html">AI 资讯</a>
+        </nav>
+        <span class="wang_topbar_user">王云鹤 · 24002060416</span>
+    </header>
+
+    <main class="wang_chat_layout">
+        <aside class="wang_side wang_card">
+            <span class="wang_side_title">当前用户</span>
+            <select class="wang_select" id="wang_userSelect" aria-label="选择用户"></select>
+            <button class="wang_btn" id="wang_newChatBtn"><i class="wang_ic wang_ic_grid"></i> 新建会话</button>
+            <span class="wang_side_title">我的会话</span>
+            <div class="wang_session_list" id="wang_sessionList"></div>
+        </aside>
+
+        <section class="wang_main wang_card">
+            <div class="wang_msg_area" id="wang_msgArea">
+                <div class="wang_empty"><i class="wang_ic wang_ic_bell"></i>选择或新建一个会话开始聊天</div>
+            </div>
+            <div class="wang_input_bar">
+                <textarea class="wang_textarea" id="wang_inputBox" placeholder="输入消息，Enter 发送，Shift+Enter 换行"></textarea>
+                <button class="wang_btn" id="wang_sendBtn">发送</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/wang_api.js"></script>
+    <script src="js/wang_chat.js"></script>
+</body>
+</html>

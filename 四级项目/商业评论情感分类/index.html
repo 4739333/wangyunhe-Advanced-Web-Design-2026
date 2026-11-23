@@ -1,0 +1,113 @@
+﻿﻿<!DOCTYPE html>
+<!-- 姓名：王云鹤 日期：2026-11-23 功能：商业评论情感分类 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商业评论情感分类 · 王云鹤</title>
+    <style>
+        /* 姓名：王云鹤 | 学号：24002060416 | 时间：2026-11-23 | 大模型：GLM-5.3-Flash */
+        /* 全部样式为原生 CSS，类名以 wyh_ 开头 */
+        *, *::before, *::after { box-sizing: border-box; }
+        :root {
+            color-scheme: dark;
+            --wyh_bg: #0B0B10;
+            --wyh_card: #1E1E23;
+            --wyh_border: #1E293B;
+            --wyh_fg: #F8FAFC;
+            --wyh_muted: #94A3B8;
+            --wyh_accent: #3B82F6;
+            --wyh_accent_hi: #60A5FA;
+            --wyh_good: #34D399;
+            --wyh_mid: #FBBF24;
+            --wyh_bad: #F87171;
+        }
+        body {
+            margin: 0; min-height: 100vh; background: var(--wyh_bg); color: var(--wyh_fg);
+            font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; line-height: 1.7;
+        }
+        .wyh_wrap { max-width: 1080px; margin: 0 auto; padding: 30px 20px 50px; }
+        .wyh_head { text-align: center; margin-bottom: 24px; }
+        .wyh_head h1 { font-size: 26px; margin: 0 0 8px; }
+        .wyh_head p { color: var(--wyh_muted); font-size: 13.5px; margin: 0; }
+        .wyh_head b { color: var(--wyh_accent_hi); font-weight: normal; }
+
+        .wyh_card { background: var(--wyh_card); border: 1px solid var(--wyh_border); border-radius: 14px; padding: 22px 24px; margin-bottom: 18px; }
+
+        /* 上传区 */
+        .wyh_drop { border: 1.5px dashed #3B82F680; border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; }
+        .wyh_drop:hover { border-color: var(--wyh_accent_hi); background: #3b82f60d; }
+        .wyh_drop p { margin: 8px 0 0; color: var(--wyh_muted); font-size: 13px; }
+        .wyh_drop strong { color: var(--wyh_accent_hi); font-size: 15px; }
+        .wyh_fileRow { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
+        .wyh_fileInfo { font-size: 13.5px; color: var(--wyh_muted); }
+        .wyh_fileInfo b { color: var(--wyh_fg); }
+        .wyh_btn { border: none; border-radius: 10px; padding: 10px 22px; font-size: 14px; cursor: pointer; color: #fff; background: linear-gradient(135deg, var(--wyh_accent), #7aa7ff); transition: opacity .2s, transform .2s; }
+        .wyh_btn:hover { transform: translateY(-2px); }
+        .wyh_btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+        .wyh_status { margin-top: 12px; font-size: 13px; color: var(--wyh_muted); min-height: 20px; }
+
+        /* 统计 + 饼图 */
+        .wyh_resultGrid { display: grid; grid-template-columns: 300px 1fr; gap: 24px; align-items: center; }
+        @media (max-width: 760px) { .wyh_resultGrid { grid-template-columns: 1fr; } }
+        .wyh_canvasBox { display: flex; justify-content: center; }
+        canvas { max-width: 100%; }
+        .wyh_statList { display: flex; flex-direction: column; gap: 12px; }
+        .wyh_statItem { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--wyh_border); border-radius: 10px; background: #3b82f608; }
+        .wyh_dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+        .wyh_statItem .wyh_name { width: 48px; font-size: 14px; }
+        .wyh_bar { flex: 1; height: 10px; background: #ffffff12; border-radius: 999px; overflow: hidden; }
+        .wyh_bar i { display: block; height: 100%; border-radius: 999px; }
+        .wyh_num { font-size: 14px; color: var(--wyh_muted); white-space: nowrap; }
+        .wyh_num b { color: var(--wyh_fg); font-size: 17px; }
+
+        /* 精选评论 */
+        .wyh_featCols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        @media (max-width: 860px) { .wyh_featCols { grid-template-columns: 1fr; } }
+        .wyh_featCol { border: 1px solid var(--wyh_border); border-radius: 12px; padding: 14px 16px; background: #3b82f608; }
+        .wyh_featCol h3 { margin: 0 0 10px; font-size: 14.5px; display: flex; align-items: center; gap: 8px; }
+        .wyh_tag { font-size: 11.5px; padding: 2px 9px; border-radius: 999px; color: #0B0B10; font-weight: bold; }
+        .wyh_comment { font-size: 12.8px; color: #C7D7F5; line-height: 1.8; padding: 9px 12px; background: #ffffff0a; border-radius: 8px; margin-top: 8px; }
+        .wyh_hide { display: none; }
+        .wyh_foot { text-align: center; color: var(--wyh_muted); font-size: 12.5px; margin-top: 26px; }
+    </style>
+</head>
+<body>
+    <main class="wyh_wrap">
+        <header class="wyh_head">
+            <h1>商业评论情感分类</h1>
+            <p>上传 Excel（.xlsx）评论文件 → 大模型逐条分类为 <b>好评 / 中评 / 差评</b> → 前端原生 Canvas 绘制饼状图并展示精选评论，收发数据见控制台 F12。<br>页面依赖本地大模型分类服务（<b>http://localhost:416/api/review/classify</b>），使用前请先启动该本地服务。</p>
+        </header>
+
+        <!-- 上传卡片 -->
+        <section class="wyh_card">
+            <div class="wyh_drop" id="wyhDrop">
+                <strong>点击选择或拖入 .xlsx 文件</strong>
+                <p>可用本目录下的模拟数据：商业评论数据_餐饮外卖 / 电商平台 / 连锁酒店（各 20 条）</p>
+                <input type="file" id="wyhFile" accept=".xlsx" class="wyh_hide">
+            </div>
+            <div class="wyh_fileRow">
+                <span class="wyh_fileInfo">已选择：<b id="wyhFileName">未选择文件</b></span>
+                <button class="wyh_btn" id="wyhGo" disabled>开始情感分类</button>
+            </div>
+            <div class="wyh_status" id="wyhStatus"></div>
+        </section>
+
+        <!-- 饼状图结果 -->
+        <section class="wyh_card wyh_hide" id="wyhChartBox">
+            <div class="wyh_resultGrid">
+                <div class="wyh_canvasBox"><canvas id="wyhPie" width="400" height="400"></canvas></div>
+                <div class="wyh_statList" id="wyhStats"></div>
+            </div>
+        </section>
+
+        <!-- 精选评论 -->
+        <section class="wyh_card wyh_hide" id="wyhFeatBox">
+            <div class="wyh_featCols" id="wyhFeat"></div>
+        </section>
+
+        <footer class="wyh_foot">王云鹤 · 24002060416 · 计算机24006 · 高级网页设计 · 四级项目：商业评论情感分类</footer>
+    </main>
+    <script src="js/wyh_review.js"></script>
+</body>
+</html>
